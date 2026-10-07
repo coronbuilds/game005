@@ -10,10 +10,9 @@ maximum-scale=1,
 user-scalable=no,
 viewport-fit=cover">
 
-<title>CAMERA HUNTER</title>
+<title>CAMERA HUNTER AR</title>
 
 <style>
-
 *{
   box-sizing:border-box;
   -webkit-user-select:none;
@@ -29,6 +28,9 @@ html,body{
   overflow:hidden;
   background:#000;
   touch-action:none;
+}
+
+body{
   font-family:Arial,sans-serif;
 }
 
@@ -48,38 +50,35 @@ html,body{
   pointer-events:none;
 }
 
-/* ====================
-   GAME FIELD
-==================== */
+/* =========================
+   FIELD
+========================= */
 
 #field{
   position:absolute;
   inset:0;
-  overflow:hidden;
   pointer-events:none;
 }
 
-/* ====================
+/* =========================
    HUD
-==================== */
+========================= */
 
 #hud{
   position:absolute;
   z-index:50;
-
   top:0;
   left:0;
   right:0;
 
   padding:
     calc(env(safe-area-inset-top) + 12px)
-    14px
-    10px;
+    15px 10px;
 
   display:flex;
   justify-content:space-between;
 
-  color:white;
+  color:#fff;
 
   text-shadow:
     0 2px 5px #000;
@@ -88,41 +87,39 @@ html,body{
 }
 
 #score{
-  font-size:27px;
+  font-size:26px;
   font-weight:1000;
 }
 
 #combo{
   color:#ffe600;
-  font-size:16px;
   font-weight:1000;
 }
 
 #time{
-  font-size:27px;
+  font-size:26px;
   font-weight:1000;
   text-align:right;
 }
 
 #lives{
   text-align:right;
-  font-size:17px;
+  margin-top:2px;
 }
 
-/* ====================
-   AIM
-==================== */
+/* =========================
+   CROSSHAIR
+========================= */
 
-#aim{
+#crosshair{
   position:absolute;
-
   z-index:80;
 
   left:50%;
   top:50%;
 
-  width:90px;
-  height:90px;
+  width:105px;
+  height:105px;
 
   transform:
     translate(-50%,-50%);
@@ -130,10 +127,9 @@ html,body{
   pointer-events:none;
 }
 
-.aimCircle{
+.ring{
   position:absolute;
-
-  inset:12px;
+  inset:14px;
 
   border:
     3px solid rgba(255,255,255,.95);
@@ -144,35 +140,29 @@ html,body{
     0 0 8px #000;
 }
 
-.aimLine1,
-.aimLine2{
+.lineH,
+.lineV{
   position:absolute;
-
   background:#fff;
-
-  box-shadow:
-    0 0 5px #000;
+  box-shadow:0 0 5px #000;
 }
 
-.aimLine1{
-  width:90px;
+.lineH{
+  width:105px;
   height:2px;
-
-  top:44px;
+  top:51px;
   left:0;
 }
 
-.aimLine2{
+.lineV{
   width:2px;
-  height:90px;
-
-  left:44px;
+  height:105px;
+  left:51px;
   top:0;
 }
 
-#aimDot{
+.dot{
   position:absolute;
-
   left:50%;
   top:50%;
 
@@ -187,21 +177,31 @@ html,body{
   background:#ff2020;
 
   box-shadow:
-    0 0 8px #ff0000;
+    0 0 8px red;
 }
 
-/* ====================
-   ENEMY
-==================== */
+#crosshair.locked .ring{
+  border-color:#ff2222;
+
+  box-shadow:
+    0 0 12px red,
+    0 0 30px rgba(255,0,0,.8);
+}
+
+#crosshair.locked .lineH,
+#crosshair.locked .lineV{
+  background:#ff2222;
+}
+
+/* =========================
+   TARGET
+========================= */
 
 .enemy{
   position:absolute;
 
-  left:0;
-  top:0;
-
-  width:78px;
-  height:78px;
+  width:75px;
+  height:75px;
 
   transform:
     translate(-50%,-50%);
@@ -213,41 +213,41 @@ html,body{
   width:100%;
   height:100%;
 
-  border-radius:50%;
-
   border:
-    3px solid white;
+    3px solid #fff;
+
+  border-radius:50%;
 
   background:
     radial-gradient(
-      circle at 35% 32%,
+      circle at 35% 35%,
       white 0 5%,
       transparent 6%
     ),
     radial-gradient(
-      circle at 65% 32%,
+      circle at 65% 35%,
       white 0 5%,
       transparent 6%
     ),
     radial-gradient(
-      circle at 35% 32%,
+      circle at 35% 35%,
       red 0 14%,
       transparent 15%
     ),
     radial-gradient(
-      circle at 65% 32%,
+      circle at 65% 35%,
       red 0 14%,
       transparent 15%
     ),
     radial-gradient(
-      circle at 50% 65%,
+      circle at 50% 68%,
       #111 0 20%,
       transparent 21%
     ),
     linear-gradient(
       145deg,
-      #ff3434,
-      #650000
+      #ff3030,
+      #620000
     );
 
   box-shadow:
@@ -264,17 +264,15 @@ html,body{
   border-width:5px;
 
   box-shadow:
-    0 0 20px red,
-    0 0 60px red;
+    0 0 25px red,
+    0 0 70px red;
 }
-
-/* HP */
 
 .hp{
   position:absolute;
 
-  left:50%;
   top:-14px;
+  left:50%;
 
   width:100%;
   height:8px;
@@ -284,7 +282,7 @@ html,body{
 
   background:#111;
 
-  border:1px solid white;
+  border:1px solid #fff;
 
   border-radius:10px;
 
@@ -297,21 +295,21 @@ html,body{
   width:100%;
   height:100%;
 
-  background:#39ff50;
+  background:#32ff45;
 }
 
-/* ====================
-   ATTACK BUTTON
-==================== */
+/* =========================
+   ATTACK
+========================= */
 
 #attack{
   position:absolute;
-
   z-index:100;
 
   left:50%;
+
   bottom:
-    calc(env(safe-area-inset-bottom) + 22px);
+    calc(env(safe-area-inset-bottom) + 20px);
 
   transform:
     translateX(-50%);
@@ -319,21 +317,20 @@ html,body{
   width:190px;
   height:72px;
 
-  border-radius:38px;
-
   border:
-    3px solid white;
+    3px solid #fff;
+
+  border-radius:38px;
 
   background:
     linear-gradient(
-      #ff3030,
-      #a90000
+      #ff3434,
+      #a50000
     );
 
-  color:white;
+  color:#fff;
 
-  font-size:25px;
-
+  font-size:24px;
   font-weight:1000;
 
   letter-spacing:2px;
@@ -354,92 +351,33 @@ html,body{
     0 1px 0 #500000;
 }
 
-/* ====================
-   MUZZLE
-==================== */
-
-#muzzle{
-  position:absolute;
-
-  z-index:90;
-
-  left:50%;
-  top:50%;
-
-  width:30px;
-  height:30px;
-
-  transform:
-    translate(-50%,-50%);
-
-  border-radius:50%;
-
-  background:#fff;
-
-  box-shadow:
-    0 0 20px 12px #ffe600;
-
-  opacity:0;
-
-  pointer-events:none;
-}
-
-#muzzle.fire{
-  animation:
-    muzzle .15s forwards;
-}
-
-@keyframes muzzle{
-
-  0%{
-    opacity:1;
-    transform:
-      translate(-50%,-50%)
-      scale(.4);
-  }
-
-  100%{
-    opacity:0;
-    transform:
-      translate(-50%,-50%)
-      scale(3);
-  }
-
-}
-
-/* ====================
+/* =========================
    HIT
-==================== */
+========================= */
 
 .hit{
   position:absolute;
-
   z-index:120;
 
   transform:
     translate(-50%,-50%);
 
-  color:white;
+  color:#fff;
 
-  font-size:27px;
-
+  font-size:28px;
   font-weight:1000;
 
   text-shadow:
     0 0 10px red,
-    0 2px 5px black;
-
-  pointer-events:none;
+    0 2px 5px #000;
 
   animation:
     hit .6s forwards;
 }
 
 @keyframes hit{
-
   from{
     opacity:1;
-
     transform:
       translate(-50%,-50%)
       scale(.7);
@@ -447,76 +385,65 @@ html,body{
 
   to{
     opacity:0;
-
     transform:
-      translate(-50%,-100px)
+      translate(-50%,-110px)
       scale(1.4);
   }
-
 }
 
-/* ====================
+/* =========================
    EXPLOSION
-==================== */
+========================= */
 
 .explosion{
   position:absolute;
-
   z-index:110;
 
   border:
-    4px solid white;
+    4px solid #fff;
 
   border-radius:50%;
 
   transform:
     translate(-50%,-50%);
 
-  pointer-events:none;
-
   animation:
     explosion .45s forwards;
 }
 
 @keyframes explosion{
-
   from{
     opacity:1;
-
     transform:
       translate(-50%,-50%)
-      scale:.2;
+      scale(.2);
   }
 
   to{
     opacity:0;
-
     transform:
       translate(-50%,-50%)
-      scale:4;
+      scale(4);
   }
-
 }
 
-/* ====================
+/* =========================
    BANNER
-==================== */
+========================= */
 
 #banner{
   position:absolute;
-
   z-index:150;
 
-  top:25%;
+  top:27%;
   left:50%;
 
   transform:
     translate(-50%,-50%);
 
-  color:white;
+  color:#fff;
 
-  font-size:36px;
-
+  font-size:38px;
   font-weight:1000;
 
   white-space:nowrap;
@@ -529,33 +456,31 @@ html,body{
   pointer-events:none;
 }
 
-/* ====================
+/* =========================
    OVERLAY
-==================== */
+========================= */
 
 .overlay{
   position:absolute;
-
   z-index:200;
 
   inset:0;
 
   display:flex;
-
   align-items:center;
   justify-content:center;
 
   padding:25px;
 
-  color:white;
-
-  text-align:center;
-
   background:
     linear-gradient(
       rgba(0,0,0,.75),
-      rgba(0,0,0,.93)
+      rgba(0,0,0,.95)
     );
+
+  color:#fff;
+
+  text-align:center;
 }
 
 .panel{
@@ -564,92 +489,49 @@ html,body{
 
 .logo{
   font-size:43px;
-
-  line-height:.88;
+  line-height:.9;
 
   font-weight:1000;
-
   letter-spacing:-2px;
 }
 
 .sub{
   margin:
-    18px 0 25px;
+    20px 0 25px;
 
   color:#ddd;
 
-  line-height:1.6;
+  line-height:1.7;
 }
 
-button{
-  border:0;
-
-  touch-action:manipulation;
-}
-
-#startButton,
-#retryButton,
-#cameraRetry{
+.startButton,
+.retryButton{
   width:100%;
-  min-height:60px;
+  min-height:62px;
 
+  border:0;
   border-radius:16px;
 
   background:#e00000;
 
-  color:white;
+  color:#fff;
 
   font-size:19px;
-
   font-weight:1000;
 
   box-shadow:
     0 6px 0 #650000;
+
+  touch-action:manipulation;
 }
 
-#startButton:active,
-#retryButton:active,
-#cameraRetry:active{
+.startButton:active,
+.retryButton:active{
   transform:
     translateY(4px);
 
   box-shadow:
     0 2px 0 #650000;
-}
-
-.secondary{
-  margin-top:12px;
-
-  width:100%;
-  min-height:55px;
-
-  border-radius:16px;
-
-  background:#222;
-
-  color:white;
-
-  font-size:17px;
-
-  font-weight:900;
-}
-
-.finalScore{
-  margin:15px 0;
-
-  font-size:55px;
-
-  font-weight:1000;
-}
-
-.rank{
-  margin-bottom:20px;
-
-  color:#ffe600;
-
-  font-size:21px;
-
-  font-weight:1000;
 }
 
 .small{
@@ -658,8 +540,43 @@ button{
   color:#aaa;
 
   font-size:13px;
-
   line-height:1.6;
+}
+
+.finalScore{
+  font-size:55px;
+  font-weight:1000;
+  margin:15px 0;
+}
+
+.rank{
+  color:#ffe600;
+
+  font-size:22px;
+  font-weight:1000;
+
+  margin-bottom:20px;
+}
+
+.secondary{
+  width:100%;
+  min-height:55px;
+
+  margin-top:12px;
+
+  border:0;
+  border-radius:16px;
+
+  background:#222;
+
+  color:#fff;
+
+  font-size:17px;
+  font-weight:900;
+}
+
+.hidden{
+  display:none !important;
 }
 
 </style>
@@ -681,48 +598,36 @@ button{
   <div id="hud">
 
     <div>
-      <div>SCORE</div>
-
-      <div id="score">
-        0
-      </div>
-
-      <div id="combo">
-        COMBO ×1
-      </div>
+      SCORE
+      <div id="score">0</div>
+      <div id="combo">COMBO ×1</div>
     </div>
 
     <div>
-
-      <div id="time">
-        60
-      </div>
-
-      <div id="lives">
-        ❤️❤️❤️
-      </div>
-
+      <div id="time">60</div>
+      <div id="lives">❤️❤️❤️</div>
     </div>
 
   </div>
 
+
   <!-- 固定照準 -->
 
-  <div id="aim">
+  <div id="crosshair">
 
-    <div class="aimCircle"></div>
+    <div class="ring"></div>
 
-    <div class="aimLine1"></div>
+    <div class="lineH"></div>
 
-    <div class="aimLine2"></div>
+    <div class="lineV"></div>
 
-    <div id="aimDot"></div>
+    <div class="dot"></div>
 
   </div>
 
-  <div id="muzzle"></div>
 
   <div id="banner"></div>
+
 
   <!-- 攻撃ボタン -->
 
@@ -733,7 +638,7 @@ button{
 
   <!-- START -->
 
-  <section
+  <div
     id="start"
     class="overlay">
 
@@ -746,61 +651,102 @@ button{
 
       <div class="sub">
 
-        📱 スマホを動かして敵を探せ。<br>
-        🎯 中央の照準に敵を入れろ。<br>
-        🔫 ATTACKで撃て。
+        📱 スマホを動かして敵を探す<br>
+        🎯 中央に敵を合わせる<br>
+        🔫 ATTACKで撃つ
 
       </div>
 
-      <button id="startButton">
-        📷 カメラを起動
+      <button
+        id="startButton"
+        class="startButton">
+
+        📷 START
+
       </button>
 
       <div class="small">
-        リアカメラを使用します。<br>
-        カメラの許可が表示されたら「許可」。
+
+        カメラとモーションセンサーを使用します。<br>
+        許可が表示されたら「許可」を押してください。
+
       </div>
 
     </div>
 
-  </section>
+  </div>
 
 
-  <!-- CAMERA ERROR -->
+  <!-- SENSOR ERROR -->
 
-  <section
-    id="cameraError"
-    class="overlay"
-    style="display:none">
+  <div
+    id="sensorError"
+    class="overlay hidden">
 
     <div class="panel">
 
       <div class="logo">
-        CAMERA<br>
-        ERROR
+        SENSOR ERROR
       </div>
 
       <div class="sub">
-        カメラを起動できませんでした。
-        <br><br>
-        Safariのカメラ許可を確認してください。
+
+        モーションセンサーを取得できませんでした。<br><br>
+
+        iPhoneのセンサー許可を確認して、<br>
+        もう一度STARTしてください。
+
       </div>
 
-      <button id="cameraRetry">
-        もう一度
+      <button
+        id="sensorRetry"
+        class="startButton">
+
+        🔄 もう一度
+
       </button>
 
     </div>
 
-  </section>
+  </div>
+
+
+  <!-- CAMERA ERROR -->
+
+  <div
+    id="cameraError"
+    class="overlay hidden">
+
+    <div class="panel">
+
+      <div class="logo">
+        CAMERA ERROR
+      </div>
+
+      <div class="sub">
+
+        カメラを起動できませんでした。
+
+      </div>
+
+      <button
+        id="cameraRetry"
+        class="startButton">
+
+        📷 もう一度
+
+      </button>
+
+    </div>
+
+  </div>
 
 
   <!-- GAME OVER -->
 
-  <section
+  <div
     id="gameOver"
-    class="overlay"
-    style="display:none">
+    class="overlay hidden">
 
     <div class="panel">
 
@@ -820,126 +766,102 @@ button{
         RANK D
       </div>
 
-      <button id="retryButton">
-        🔥 もう一度
+      <button
+        id="retryButton"
+        class="retryButton">
+
+        🔥 AGAIN
+
       </button>
 
       <button
         id="stopButton"
         class="secondary">
+
         カメラを停止
+
       </button>
 
     </div>
 
-  </section>
+  </div>
 
 </div>
 
 
 <script>
 
+/* =========================================
+   CAMERA HUNTER AR
+========================================= */
+
 "use strict";
 
 
-/* =====================
-   DOM
-===================== */
-
 const camera =
-  document.getElementById(
-    "camera"
-  );
+  document.getElementById("camera");
 
 const field =
-  document.getElementById(
-    "field"
-  );
+  document.getElementById("field");
 
 const start =
-  document.getElementById(
-    "start"
-  );
-
-const cameraError =
-  document.getElementById(
-    "cameraError"
-  );
-
-const gameOver =
-  document.getElementById(
-    "gameOver"
-  );
+  document.getElementById("start");
 
 const startButton =
-  document.getElementById(
-    "startButton"
-  );
-
-const cameraRetry =
-  document.getElementById(
-    "cameraRetry"
-  );
-
-const retryButton =
-  document.getElementById(
-    "retryButton"
-  );
-
-const stopButton =
-  document.getElementById(
-    "stopButton"
-  );
+  document.getElementById("startButton");
 
 const attack =
-  document.getElementById(
-    "attack"
-  );
+  document.getElementById("attack");
 
-const muzzle =
-  document.getElementById(
-    "muzzle"
-  );
+const crosshair =
+  document.getElementById("crosshair");
+
+const sensorError =
+  document.getElementById("sensorError");
+
+const sensorRetry =
+  document.getElementById("sensorRetry");
+
+const cameraError =
+  document.getElementById("cameraError");
+
+const cameraRetry =
+  document.getElementById("cameraRetry");
+
+const gameOver =
+  document.getElementById("gameOver");
+
+const retryButton =
+  document.getElementById("retryButton");
+
+const stopButton =
+  document.getElementById("stopButton");
 
 const scoreEl =
-  document.getElementById(
-    "score"
-  );
+  document.getElementById("score");
 
 const comboEl =
-  document.getElementById(
-    "combo"
-  );
+  document.getElementById("combo");
 
 const timeEl =
-  document.getElementById(
-    "time"
-  );
+  document.getElementById("time");
 
 const livesEl =
-  document.getElementById(
-    "lives"
-  );
+  document.getElementById("lives");
 
-const finalScoreEl =
-  document.getElementById(
-    "finalScore"
-  );
+const finalScore =
+  document.getElementById("finalScore");
 
 const rankEl =
-  document.getElementById(
-    "rank"
-  );
+  document.getElementById("rank");
 
 const banner =
-  document.getElementById(
-    "banner"
-  );
+  document.getElementById("banner");
 
 
-/* =====================
-   STATE
-===================== */
+/* =========================================
+   GAME STATE
+========================================= */
 
 let stream = null;
 
@@ -961,17 +883,225 @@ let enemies = new Map();
 
 let timer = null;
 
-let spawner = null;
+let spawnTimer = null;
+
+let lastFrame = 0;
+
+let lastShot = 0;
 
 
-/* =====================
+/* =========================================
+   SENSOR STATE
+========================================= */
+
+/*
+ * 現在のスマホの向き
+ */
+
+let currentAlpha = null;
+let currentBeta = null;
+
+
+/*
+ * ゲーム開始時の向き
+ */
+
+let baseAlpha = null;
+let baseBeta = null;
+
+
+/*
+ * センサーが動いているか
+ */
+
+let sensorReady = false;
+
+
+/*
+ * 初期化
+ */
+
+function onOrientation(event){
+
+  if(
+    event.alpha === null ||
+    event.beta === null
+  ){
+    return;
+  }
+
+
+  currentAlpha =
+    event.alpha;
+
+  currentBeta =
+    event.beta;
+
+
+  /*
+   * 初回だけ基準位置を保存
+   */
+
+  if(
+    baseAlpha === null
+  ){
+
+    baseAlpha =
+      currentAlpha;
+
+    baseBeta =
+      currentBeta;
+
+  }
+
+
+  sensorReady = true;
+
+}
+
+
+/* =========================================
+   ANGLE
+========================================= */
+
+function angleDifference(
+  a,
+  b
+){
+
+  let d =
+    a - b;
+
+
+  while(d > 180)
+    d -= 360;
+
+
+  while(d < -180)
+    d += 360;
+
+
+  return d;
+
+}
+
+
+/*
+ * 現在の視線方向を
+ * 基準位置から何度動かしたか
+ */
+
+function getViewYaw(){
+
+  if(
+    currentAlpha === null ||
+    baseAlpha === null
+  ){
+    return 0;
+  }
+
+
+  return angleDifference(
+    currentAlpha,
+    baseAlpha
+  );
+
+}
+
+
+function getViewPitch(){
+
+  if(
+    currentBeta === null ||
+    baseBeta === null
+  ){
+    return 0;
+  }
+
+
+  return currentBeta -
+         baseBeta;
+
+}
+
+
+/* =========================================
+   MOTION PERMISSION
+========================================= */
+
+async function enableMotion(){
+
+  /*
+   * iPhone Safari
+   */
+
+  if(
+    typeof DeviceOrientationEvent ===
+    "undefined"
+  ){
+
+    return false;
+
+  }
+
+
+  /*
+   * iOSではユーザー操作中に
+   * requestPermissionを呼ぶ必要がある
+   */
+
+  if(
+    typeof DeviceOrientationEvent
+      .requestPermission ===
+    "function"
+  ){
+
+    try{
+
+      const permission =
+        await DeviceOrientationEvent
+          .requestPermission();
+
+
+      if(
+        permission !== "granted"
+      ){
+
+        return false;
+
+      }
+
+    }catch(error){
+
+      return false;
+
+    }
+
+  }
+
+
+  window.addEventListener(
+    "deviceorientation",
+    onOrientation,
+    true
+  );
+
+
+  return true;
+
+}
+
+
+/* =========================================
    CAMERA
-===================== */
+========================================= */
 
-async function startCamera(){
+async function openCamera(){
 
-  cameraError.style.display =
-    "none";
+  cameraError.classList.add(
+    "hidden"
+  );
+
 
   try{
 
@@ -981,10 +1111,11 @@ async function startCamera(){
     ){
 
       throw new Error(
-        "Camera unavailable"
+        "camera unavailable"
       );
 
     }
+
 
     stopCamera();
 
@@ -1006,7 +1137,6 @@ async function startCamera(){
             height:{
               ideal:720
             }
-
           },
 
           audio:false
@@ -1025,8 +1155,9 @@ async function startCamera(){
 
   }catch(error){
 
-    cameraError.style.display =
-      "flex";
+    cameraError.classList.remove(
+      "hidden"
+    );
 
     return false;
 
@@ -1056,41 +1187,144 @@ function stopCamera(){
 }
 
 
-/* =====================
-   HUD
-===================== */
+/* =========================================
+   START
+========================================= */
 
-function updateHUD(){
+async function prepareGame(){
 
-  scoreEl.textContent =
-    score.toLocaleString();
+  startButton.disabled =
+    true;
 
-  comboEl.textContent =
-    "COMBO ×" +
-    Math.max(
-      1,
-      combo
+
+  /*
+   * 重要：
+   * motion permissionを先に要求する。
+   */
+
+  const motionPromise =
+    enableMotion();
+
+
+  const cameraPromise =
+    openCamera();
+
+
+  const [
+    motionOK,
+    cameraOK
+  ] =
+    await Promise.all([
+      motionPromise,
+      cameraPromise
+    ]);
+
+
+  startButton.disabled =
+    false;
+
+
+  if(!cameraOK){
+
+    return;
+
+  }
+
+
+  if(!motionOK){
+
+    sensorError.classList.remove(
+      "hidden"
     );
 
-  timeEl.textContent =
-    time;
+    return;
 
-  livesEl.textContent =
-    "❤️".repeat(lives) +
-    "🖤".repeat(
-      3 - lives
+  }
+
+
+  /*
+   * 少し待ってセンサー値を取得
+   */
+
+  const startWait =
+    performance.now();
+
+
+  while(
+    !sensorReady &&
+    performance.now() -
+    startWait < 1500
+  ){
+
+    await new Promise(
+      resolve =>
+        setTimeout(
+          resolve,
+          50
+        )
     );
+
+  }
+
+
+  if(!sensorReady){
+
+    sensorError.classList.remove(
+      "hidden"
+    );
+
+    return;
+
+  }
+
+
+  start.classList.add(
+    "hidden"
+  );
+
+
+  sensorError.classList.add(
+    "hidden"
+  );
+
+
+  resetSensorBase();
+
+
+  startGame();
 
 }
 
 
-/* =====================
+/* =========================================
+   RESET SENSOR
+========================================= */
+
+function resetSensorBase(){
+
+  if(
+    currentAlpha !== null &&
+    currentBeta !== null
+  ){
+
+    baseAlpha =
+      currentAlpha;
+
+    baseBeta =
+      currentBeta;
+
+  }
+
+}
+
+
+/* =========================================
    START GAME
-===================== */
+========================================= */
 
 function startGame(){
 
-  stopGameObjects();
+  stopGame();
 
 
   score = 0;
@@ -1106,33 +1340,29 @@ function startGame(){
   playing = true;
 
 
-  start.style.display =
-    "none";
-
-  cameraError.style.display =
-    "none";
-
-  gameOver.style.display =
-    "none";
-
-
   updateHUD();
 
 
   /*
-   * 敵を最初から少し出す
+   * 最初の敵
    */
 
-  createEnemy();
+  for(
+    let i=0;
+    i<3;
+    i++
+  ){
 
-  createEnemy();
+    spawnEnemy();
+
+  }
 
 
   /*
    * 敵追加
    */
 
-  spawner =
+  spawnTimer =
     setInterval(
       () => {
 
@@ -1140,14 +1370,25 @@ function startGame(){
           return;
 
 
-        const amount =
-          Math.min(
-            3,
-            1 +
-            Math.floor(
-              elapsed / 15
-            )
-          );
+        let amount = 1;
+
+
+        if(
+          elapsed >= 20
+        ){
+
+          amount = 2;
+
+        }
+
+
+        if(
+          elapsed >= 40
+        ){
+
+          amount = 3;
+
+        }
 
 
         for(
@@ -1157,19 +1398,19 @@ function startGame(){
         ){
 
           setTimeout(
-            createEnemy,
-            i * 250
+            spawnEnemy,
+            i * 180
           );
 
         }
 
       },
-      1300
+      1500
     );
 
 
   /*
-   * タイマー
+   * 時間
    */
 
   timer =
@@ -1200,7 +1441,7 @@ function startGame(){
             "👑 BOSS"
           );
 
-          createBoss();
+          spawnBoss();
 
         }
 
@@ -1227,96 +1468,78 @@ function startGame(){
       1000
     );
 
+
+  requestAnimationFrame(
+    gameLoop
+  );
+
 }
 
 
-/* =====================
-   CREATE ENEMY
-===================== */
+/* =========================================
+   SPAWN ENEMY
+========================================= */
 
-function createEnemy(){
+function spawnEnemy(){
 
   if(!playing)
     return;
 
 
-  if(enemies.size >= 10)
+  if(enemies.size >= 12)
     return;
 
 
-  const w =
-    window.innerWidth;
+  /*
+   * 敵を「現在の画面」に固定するのではなく、
+   * 空間上の角度に置く。
+   *
+   * yaw = 左右
+   * pitch = 上下
+   */
 
-  const h =
-    window.innerHeight;
+  const viewYaw =
+    getViewYaw();
+
+  const viewPitch =
+    getViewPitch();
 
 
   /*
-   * 画面の端に出現
-   *
-   * カメラを動かすと
-   * その敵を画面中央に持ってくる
+   * 今向いている方向から
+   * 15〜55度離れたところに配置
    */
 
-  const side =
-    Math.floor(
-      Math.random() * 4
+  const direction =
+    Math.random() < .5
+      ? -1
+      : 1;
+
+
+  const yaw =
+    viewYaw +
+    direction *
+    (
+      18 +
+      Math.random() * 42
     );
 
 
-  let x;
-  let y;
+  const pitch =
+    viewPitch +
+    (
+      Math.random() * 44 -
+      22
+    );
 
 
-  if(side === 0){
-
-    x =
-      50 +
-      Math.random() *
-      (w - 100);
-
-    y = 130;
-
-  }
-  else if(side === 1){
-
-    x = w - 40;
-
-    y =
-      150 +
-      Math.random() *
-      (h - 300);
-
-  }
-  else if(side === 2){
-
-    x =
-      50 +
-      Math.random() *
-      (w - 100);
-
-    y = h - 130;
-
-  }
-  else{
-
-    x = 40;
-
-    y =
-      150 +
-      Math.random() *
-      (h - 300);
-
-  }
-
-
-  const el =
+  const enemyElement =
     document.createElement(
       "div"
     );
 
 
-  el.className =
+  enemyElement.className =
     "enemy";
 
 
@@ -1330,70 +1553,76 @@ function createEnemy(){
     "enemyBody";
 
 
-  el.appendChild(
+  enemyElement.appendChild(
     body
   );
 
 
   field.appendChild(
-    el
+    enemyElement
   );
-
-
-  const id =
-    ++enemyId;
 
 
   const enemy = {
 
-    id,
+    id:++enemyId,
 
-    element:el,
+    element:
+      enemyElement,
 
-    x,
+    yaw,
 
-    y,
-
-    life:
-      1800 +
-      Math.random() *
-      1200,
-
-    created:
-      performance.now(),
+    pitch,
 
     hp:1,
 
-    boss:false
+    boss:false,
+
+    born:
+      performance.now(),
+
+    lifetime:
+      6000 +
+      Math.random() * 2500,
+
+    depth:
+      0
 
   };
 
 
   enemies.set(
-    id,
+    enemy.id,
     enemy
   );
 
 }
 
 
-/* =====================
+/* =========================================
    BOSS
-===================== */
+========================================= */
 
-function createBoss(){
+function spawnBoss(){
 
-  const w =
-    window.innerWidth;
+  if(!playing)
+    return;
 
 
-  const el =
+  const viewYaw =
+    getViewYaw();
+
+  const viewPitch =
+    getViewPitch();
+
+
+  const enemyElement =
     document.createElement(
       "div"
     );
 
 
-  el.className =
+  enemyElement.className =
     "enemy boss";
 
 
@@ -1407,7 +1636,7 @@ function createBoss(){
     "enemyBody";
 
 
-  el.appendChild(
+  enemyElement.appendChild(
     body
   );
 
@@ -1422,72 +1651,239 @@ function createBoss(){
     "hp";
 
 
-  const hpFill =
+  const fill =
     document.createElement(
       "i"
     );
 
 
-  hp.appendChild(
-    hpFill
-  );
+  hp.appendChild(fill);
 
-  el.appendChild(
+  enemyElement.appendChild(
     hp
   );
 
 
   field.appendChild(
-    el
+    enemyElement
   );
-
-
-  const id =
-    ++enemyId;
 
 
   const enemy = {
 
-    id,
+    id:++enemyId,
 
-    element:el,
+    element:
+      enemyElement,
 
-    x:w / 2,
+    yaw:
+      viewYaw +
+      (
+        Math.random() < .5
+          ? -1
+          : 1
+      ) * 25,
 
-    y:150,
-
-    life:7000,
-
-    created:
-      performance.now(),
+    pitch:
+      viewPitch +
+      (
+        Math.random() * 30 -
+        15
+      ),
 
     hp:5,
 
+    maxHp:5,
+
+    hpFill:fill,
+
     boss:true,
 
-    hpFill
+    born:
+      performance.now(),
+
+    lifetime:10000,
+
+    depth:0
 
   };
 
 
   enemies.set(
-    id,
+    enemy.id,
     enemy
   );
 
 }
 
 
-/* =====================
-   FIND TARGET
-===================== */
+/* =========================================
+   ENEMY SCREEN POSITION
+========================================= */
 
 /*
- * ここが今回の重要部分。
+ * ここが今回の核心。
  *
- * ATTACKを押した瞬間、
- * 画面中央に敵がいるか判定。
+ * 敵は「画面x/y」を持たない。
+ *
+ * 敵は
+ *
+ *   yaw   = 空間上の左右角度
+ *   pitch = 空間上の上下角度
+ *
+ * を持っている。
+ *
+ * スマホを動かすと
+ * viewYaw / viewPitch が変わる。
+ *
+ * その差から画面位置を計算する。
  */
+
+function projectEnemy(
+  enemy
+){
+
+  const w =
+    window.innerWidth;
+
+  const h =
+    window.innerHeight;
+
+
+  const viewYaw =
+    getViewYaw();
+
+  const viewPitch =
+    getViewPitch();
+
+
+  /*
+   * 敵と現在のカメラ方向の角度差
+   */
+
+  const dxAngle =
+    angleDifference(
+      enemy.yaw,
+      viewYaw
+    );
+
+
+  const dyAngle =
+    enemy.pitch -
+    viewPitch;
+
+
+  /*
+   * 仮想カメラの視野角
+   */
+
+  const FOV_X = 70;
+
+  const FOV_Y = 55;
+
+
+  /*
+   * 角度 → 画面座標
+   */
+
+  const x =
+    w / 2 +
+    (
+      dxAngle /
+      FOV_X
+    ) *
+    w;
+
+
+  const y =
+    h / 2 +
+    (
+      dyAngle /
+      FOV_Y
+    ) *
+    h;
+
+
+  /*
+   * 奥から手前へ
+   */
+
+  const age =
+    performance.now() -
+    enemy.born;
+
+
+  const progress =
+    Math.min(
+      1,
+      age /
+      enemy.lifetime
+    );
+
+
+  /*
+   * 少しずつ大きくなる
+   */
+
+  const scale =
+    enemy.boss
+      ? .65 +
+        progress * .75
+      : .45 +
+        progress * 1.15;
+
+
+  enemy.element.style.left =
+    x + "px";
+
+
+  enemy.element.style.top =
+    y + "px";
+
+
+  enemy.element.style.transform =
+    "translate(-50%,-50%) " +
+    "scale(" +
+    scale +
+    ")";
+
+
+  /*
+   * 画面外なら少し透明にする
+   */
+
+  const margin = 100;
+
+  if(
+    x < -margin ||
+    x > w + margin ||
+    y < -margin ||
+    y > h + margin
+  ){
+
+    enemy.element.style.opacity =
+      ".35";
+
+  }else{
+
+    enemy.element.style.opacity =
+      "1";
+
+  }
+
+
+  return {
+    x,
+    y,
+    scale
+  };
+
+}
+
+
+/* =========================================
+   FIND TARGET
+========================================= */
 
 function getTarget(){
 
@@ -1500,17 +1896,24 @@ function getTarget(){
 
   let target = null;
 
-  let closest = Infinity;
+  let best = Infinity;
 
 
   enemies.forEach(
     enemy => {
 
+      const pos =
+        projectEnemy(
+          enemy
+        );
+
+
       const dx =
-        enemy.x - cx;
+        pos.x - cx;
 
       const dy =
-        enemy.y - cy;
+        pos.y - cy;
+
 
       const distance =
         Math.sqrt(
@@ -1520,25 +1923,31 @@ function getTarget(){
 
 
       /*
-       * 中央の照準内
+       * 照準内
        */
 
-      const allowed =
+      const hitRadius =
         enemy.boss
           ? 95
-          : 65;
+          : 60;
 
 
       if(
-        distance <= allowed &&
-        distance < closest
+        distance <=
+        hitRadius
       ){
 
-        closest =
-          distance;
+        if(
+          distance < best
+        ){
 
-        target =
-          enemy;
+          best =
+            distance;
+
+          target =
+            enemy;
+
+        }
 
       }
 
@@ -1551,44 +1960,82 @@ function getTarget(){
 }
 
 
-/* =====================
-   ATTACK
-===================== */
+/* =========================================
+   LOCK INDICATOR
+========================================= */
 
-function fire(){
+function updateAim(){
+
+  if(!playing){
+
+    crosshair.classList.remove(
+      "locked"
+    );
+
+    return;
+
+  }
+
+
+  const target =
+    getTarget();
+
+
+  if(target){
+
+    crosshair.classList.add(
+      "locked"
+    );
+
+  }else{
+
+    crosshair.classList.remove(
+      "locked"
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   ATTACK
+========================================= */
+
+function attackTarget(){
 
   if(!playing)
     return;
 
 
   /*
-   * 銃口フラッシュ
+   * 連打しすぎ防止
    */
 
-  muzzle.classList.remove(
-    "fire"
-  );
-
-  void muzzle.offsetWidth;
-
-  muzzle.classList.add(
-    "fire"
-  );
+  const now =
+    performance.now();
 
 
-  /*
-   * ターゲット取得
-   */
+  if(
+    now -
+    lastShot <
+    150
+  ){
+
+    return;
+
+  }
+
+
+  lastShot =
+    now;
+
 
   const target =
     getTarget();
 
 
   if(!target){
-
-    /*
-     * MISS
-     */
 
     combo = 0;
 
@@ -1604,7 +2051,7 @@ function fire(){
       navigator.vibrate
     ){
 
-      navigator.vibrate(20);
+      navigator.vibrate(15);
 
     }
 
@@ -1615,10 +2062,6 @@ function fire(){
 
   }
 
-
-  /*
-   * HIT
-   */
 
   target.hp--;
 
@@ -1636,6 +2079,10 @@ function fire(){
     );
 
 
+  /*
+   * まだ生きている
+   */
+
   if(
     target.hp > 0
   ){
@@ -1645,23 +2092,36 @@ function fire(){
       multiplier;
 
 
+    const pos =
+      projectEnemy(
+        target
+      );
+
+
     showHit(
-      target.x,
-      target.y,
+      pos.x,
+      pos.y,
       "HIT!"
     );
 
 
-    updateBossHP(
-      target
-    );
+    if(target.hpFill){
+
+      target.hpFill.style.width =
+        (
+          target.hp /
+          target.maxHp *
+          100
+        ) + "%";
+
+    }
 
 
     if(
       navigator.vibrate
     ){
 
-      navigator.vibrate(30);
+      navigator.vibrate(25);
 
     }
 
@@ -1679,26 +2139,32 @@ function fire(){
 
   const points =
     target.boss
-      ? 2000 * multiplier
+      ? 3000 * multiplier
       : 150 * multiplier;
 
 
   score += points;
 
 
+  const pos =
+    projectEnemy(
+      target
+    );
+
+
   showHit(
-    target.x,
-    target.y,
+    pos.x,
+    pos.y,
     "+" + points
   );
 
 
   explode(
-    target.x,
-    target.y,
+    pos.x,
+    pos.y,
     target.boss
       ? 150
-      : 75
+      : 80
   );
 
 
@@ -1710,12 +2176,10 @@ function fire(){
   );
 
 
-  if(
-    target.boss
-  ){
+  if(target.boss){
 
     showBanner(
-      "BOSS DOWN!"
+      "💥 BOSS DOWN!"
     );
 
   }
@@ -1728,7 +2192,7 @@ function fire(){
     navigator.vibrate(
       target.boss
         ? [50,30,100]
-        : 25
+        : 30
     );
 
   }
@@ -1739,60 +2203,38 @@ function fire(){
 }
 
 
-/* =====================
-   BOSS HP
-===================== */
-
-function updateBossHP(
-  enemy
-){
-
-  if(
-    !enemy.boss ||
-    !enemy.hpFill
-  )
-    return;
-
-
-  enemy.hpFill.style.width =
-    (
-      enemy.hp / 5 * 100
-    ) + "%";
-
-}
-
-
-/* =====================
+/* =========================================
    GAME LOOP
-===================== */
+========================================= */
 
-function update(){
+function gameLoop(
+  timestamp
+){
 
   if(!playing)
     return;
 
 
-  const now =
-    performance.now();
-
+  /*
+   * 敵を更新
+   */
 
   enemies.forEach(
     enemy => {
 
+      const age =
+        timestamp -
+        enemy.born;
+
+
       /*
-       * 一定時間画面にいる
-       * 敵を消す
+       * 敵が時間切れ
        */
 
       if(
-        now -
-        enemy.created >
-        enemy.life
+        age >
+        enemy.lifetime
       ){
-
-        /*
-         * 敵を逃した
-         */
 
         enemy.element.remove();
 
@@ -1800,6 +2242,10 @@ function update(){
           enemy.id
         );
 
+
+        /*
+         * 逃した
+         */
 
         lives--;
 
@@ -1809,109 +2255,73 @@ function update(){
         updateHUD();
 
 
-        if(lives <= 0){
+        if(
+          lives <= 0
+        ){
 
           endGame();
 
         }
+
 
         return;
 
       }
 
 
-      /*
-       * 敵を少し上下左右に動かす
-       * ただし「狙える範囲」
-       */
-
-      const t =
-        (
-          now -
-          enemy.created
-        ) / 1000;
-
-
-      const radius =
-        enemy.boss
-          ? 55
-          : 30;
-
-
-      const centerX =
-        enemy.x;
-
-
-      const centerY =
-        enemy.y;
-
-
-      const px =
-        centerX +
-        Math.sin(
-          t * 1.7
-        ) *
-        radius;
-
-
-      const py =
-        centerY +
-        Math.cos(
-          t * 1.4
-        ) *
-        radius;
-
-
-      enemy.element.style.left =
-        px + "px";
-
-
-      enemy.element.style.top =
-        py + "px";
-
-
-      /*
-       * 敵が見えている時間で
-       * 少しずつ大きくする
-       */
-
-      const progress =
-        Math.min(
-          1,
-          (
-            now -
-            enemy.created
-          ) /
-          enemy.life
-        );
-
-
-      const scale =
-        .7 +
-        progress *
-        .8;
-
-
-      enemy.element.style.transform =
-        "translate(-50%,-50%) " +
-        "scale(" +
-        scale +
-        ")";
+      projectEnemy(
+        enemy
+      );
 
     }
   );
 
 
+  /*
+   * 照準のロック状態
+   */
+
+  updateAim();
+
+
   requestAnimationFrame(
-    update
+    gameLoop
   );
 
 }
 
 
-/* =====================
-   HIT TEXT
-===================== */
+/* =========================================
+   HUD
+========================================= */
+
+function updateHUD(){
+
+  scoreEl.textContent =
+    score.toLocaleString();
+
+  comboEl.textContent =
+    "COMBO ×" +
+    Math.max(
+      1,
+      combo
+    );
+
+  timeEl.textContent =
+    time;
+
+  livesEl.textContent =
+    "❤️".repeat(lives) +
+    "🖤".repeat(
+      3 - lives
+    );
+
+}
+
+
+/* =========================================
+   HIT
+========================================= */
 
 function showHit(
   x,
@@ -1955,9 +2365,9 @@ function showHit(
 }
 
 
-/* =====================
+/* =========================================
    EXPLOSION
-===================== */
+========================================= */
 
 function explode(
   x,
@@ -2005,11 +2415,11 @@ function explode(
 }
 
 
-/* =====================
+/* =========================================
    BANNER
-===================== */
+========================================= */
 
-let bannerTimer;
+let bannerTimeout = null;
 
 
 function showBanner(
@@ -2019,17 +2429,16 @@ function showBanner(
   banner.textContent =
     text;
 
-
   banner.style.opacity =
     "1";
 
 
   clearTimeout(
-    bannerTimer
+    bannerTimeout
   );
 
 
-  bannerTimer =
+  bannerTimeout =
     setTimeout(
       () => {
 
@@ -2037,15 +2446,15 @@ function showBanner(
           "0";
 
       },
-      1000
+      1100
     );
 
 }
 
 
-/* =====================
-   END
-===================== */
+/* =========================================
+   GAME OVER
+========================================= */
 
 function endGame(){
 
@@ -2056,10 +2465,10 @@ function endGame(){
   playing = false;
 
 
-  stopGameObjects();
+  stopGame();
 
 
-  finalScoreEl.textContent =
+  finalScore.textContent =
     score.toLocaleString();
 
 
@@ -2067,8 +2476,9 @@ function endGame(){
     getRank(score);
 
 
-  gameOver.style.display =
-    "flex";
+  gameOver.classList.remove(
+    "hidden"
+  );
 
 
   saveHighScore();
@@ -2076,20 +2486,20 @@ function endGame(){
 }
 
 
-function stopGameObjects(){
+function stopGame(){
 
   clearInterval(
     timer
   );
 
   clearInterval(
-    spawner
+    spawnTimer
   );
 
 
   timer = null;
 
-  spawner = null;
+  spawnTimer = null;
 
 
   enemies.forEach(
@@ -2103,24 +2513,24 @@ function stopGameObjects(){
 }
 
 
-/* =====================
+/* =========================================
    RANK
-===================== */
+========================================= */
 
 function getRank(
-  score
+  value
 ){
 
-  if(score >= 20000)
+  if(value >= 20000)
     return "RANK S";
 
-  if(score >= 12000)
+  if(value >= 12000)
     return "RANK A";
 
-  if(score >= 7000)
+  if(value >= 7000)
     return "RANK B";
 
-  if(score >= 3000)
+  if(value >= 3000)
     return "RANK C";
 
   return "RANK D";
@@ -2128,9 +2538,9 @@ function getRank(
 }
 
 
-/* =====================
+/* =========================================
    HIGH SCORE
-===================== */
+========================================= */
 
 function saveHighScore(){
 
@@ -2142,7 +2552,9 @@ function saveHighScore(){
     );
 
 
-  if(score > old){
+  if(
+    score > old
+  ){
 
     localStorage.setItem(
       "cameraHunterBest",
@@ -2154,35 +2566,25 @@ function saveHighScore(){
 }
 
 
-/* =====================
+/* =========================================
    BUTTONS
-===================== */
+========================================= */
 
 startButton.addEventListener(
   "click",
-  async () => {
-
-    startButton.disabled =
-      true;
+  prepareGame
+);
 
 
-    const ok =
-      await startCamera();
+sensorRetry.addEventListener(
+  "click",
+  () => {
 
+    sensorError.classList.add(
+      "hidden"
+    );
 
-    startButton.disabled =
-      false;
-
-
-    if(ok){
-
-      startGame();
-
-      requestAnimationFrame(
-        update
-      );
-
-    }
+    prepareGame();
 
   }
 );
@@ -2190,41 +2592,23 @@ startButton.addEventListener(
 
 cameraRetry.addEventListener(
   "click",
-  async () => {
-
-    const ok =
-      await startCamera();
-
-
-    if(ok){
-
-      startGame();
-
-      requestAnimationFrame(
-        update
-      );
-
-    }
-
-  }
+  prepareGame
 );
 
 
 /*
- * ★★★
- * 攻撃はこのボタンだけ
- * ★★★
+ * ★ 攻撃はATTACKボタンのみ
  */
 
 attack.addEventListener(
   "pointerdown",
-  e => {
+  event => {
 
-    e.preventDefault();
+    event.preventDefault();
 
-    e.stopPropagation();
+    event.stopPropagation();
 
-    fire();
+    attackTarget();
 
   },
   {
@@ -2237,15 +2621,13 @@ retryButton.addEventListener(
   "click",
   () => {
 
-    if(stream){
+    gameOver.classList.add(
+      "hidden"
+    );
 
-      startGame();
+    resetSensorBase();
 
-      requestAnimationFrame(
-        update
-      );
-
-    }
+    startGame();
 
   }
 );
@@ -2257,63 +2639,85 @@ stopButton.addEventListener(
 
     playing = false;
 
-    stopGameObjects();
+    stopGame();
 
     stopCamera();
 
+    gameOver.classList.add(
+      "hidden"
+    );
 
-    gameOver.style.display =
-      "none";
-
-
-    start.style.display =
-      "flex";
+    start.classList.remove(
+      "hidden"
+    );
 
   }
 );
 
 
-/* =====================
-   PREVENT ZOOM
-===================== */
+/* =========================================
+   MOBILE ZOOM PREVENTION
+========================================= */
 
-function preventZoom(e){
+function noZoom(event){
 
-  e.preventDefault();
+  event.preventDefault();
 
 }
 
 
 document.addEventListener(
   "dblclick",
-  preventZoom,
+  noZoom,
   {
     passive:false
   }
 );
-
 
 document.addEventListener(
   "gesturestart",
-  preventZoom,
+  noZoom,
   {
     passive:false
   }
 );
-
 
 document.addEventListener(
   "gesturechange",
-  preventZoom,
+  noZoom,
+  {
+    passive:false
+  }
+);
+
+document.addEventListener(
+  "gestureend",
+  noZoom,
   {
     passive:false
   }
 );
 
 
+/*
+ * 画面のタッチでは何もしない
+ */
+
 document.addEventListener(
-  "gestureend",
-  preventZoom,
+  "touchstart",
+  event => {
+
+    if(
+      !event.target.closest(
+        "button"
+      )
+    ){
+
+      event.preventDefault();
+
+    }
+
+  },
   {
     passive:false
   }
