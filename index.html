@@ -4,858 +4,2172 @@
 <meta charset="UTF-8">
 
 <meta name="viewport"
-      content="width=device-width,
-               initial-scale=1,
-               maximum-scale=1,
-               user-scalable=no,
-               viewport-fit=cover">
+content="width=device-width,
+initial-scale=1,
+maximum-scale=1,
+user-scalable=no,
+viewport-fit=cover">
 
-<title>CAMERA HUNTER</title>
+<title>CAMERA HUNTER 2</title>
 
 <style>
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  user-select: none;
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;
+  user-select:none;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #050505;
-  font-family: Arial, sans-serif;
-  touch-action: manipulation;
+html,
+body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#000;
+  touch-action:manipulation;
+  font-family:Arial,sans-serif;
 }
 
-#game {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  background: #000;
+#game{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  background:#000;
 }
 
-#camera {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #111;
+/* カメラ */
+
+#camera{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  background:#111;
 }
 
-#gameLayer {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
+/* ゲームレイヤー */
+
+#gameLayer{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
 }
 
-#hud {
-  position: absolute;
-  top: env(safe-area-inset-top, 0px);
-  left: 0;
-  right: 0;
-  height: 75px;
-  padding: 12px 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  color: white;
-  pointer-events: none;
-  z-index: 50;
-  text-shadow: 0 2px 4px #000;
+/* HUD */
+
+#hud{
+  position:absolute;
+  z-index:50;
+  top:0;
+  left:0;
+  right:0;
+
+  padding:
+    calc(env(safe-area-inset-top) + 10px)
+    14px
+    8px;
+
+  display:flex;
+  justify-content:space-between;
+
+  color:white;
+
+  text-shadow:
+    0 2px 5px #000;
+
+  pointer-events:none;
 }
 
-.hudBox {
-  font-weight: 900;
-  font-size: 16px;
+.hudLeft,
+.hudRight{
+  font-weight:900;
 }
 
-#score {
-  font-size: 25px;
+#score{
+  font-size:26px;
 }
 
-#combo {
-  color: #ffe600;
-  font-size: 18px;
+#combo{
+  font-size:16px;
+  color:#ffe600;
 }
 
-#time {
-  font-size: 25px;
-  text-align: right;
+#time{
+  font-size:26px;
+  text-align:right;
 }
 
-#lives {
-  font-size: 18px;
-  text-align: right;
+#lives{
+  font-size:17px;
+  text-align:right;
 }
 
-.enemy {
-  position: absolute;
-  width: 72px;
-  height: 72px;
-  transform: translate(-50%, -50%);
-  z-index: 20;
-  animation: enemyFloat .8s infinite alternate ease-in-out;
+/* 照準 */
+
+#crosshair{
+  position:absolute;
+
+  z-index:40;
+
+  width:56px;
+  height:56px;
+
+  transform:
+    translate(-50%,-50%);
+
+  pointer-events:none;
 }
 
-.enemyBody {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
+#crosshair:before,
+#crosshair:after{
+  content:"";
+
+  position:absolute;
+
+  background:white;
+
+  box-shadow:
+    0 0 5px #000;
+}
+
+#crosshair:before{
+  width:56px;
+  height:2px;
+
+  left:0;
+  top:27px;
+}
+
+#crosshair:after{
+  width:2px;
+  height:56px;
+
+  left:27px;
+  top:0;
+}
+
+/* 敵 */
+
+.enemy{
+  position:absolute;
+
+  width:74px;
+  height:74px;
+
+  transform:
+    translate(-50%,-50%);
+
+  z-index:20;
+
+  touch-action:none;
+}
+
+.enemyBody{
+  width:100%;
+  height:100%;
+
+  border-radius:50%;
+
+  border:3px solid white;
+
   background:
-    radial-gradient(circle at 35% 30%, #fff 0 5%, transparent 6%),
-    radial-gradient(circle at 65% 30%, #fff 0 5%, transparent 6%),
-    radial-gradient(circle at 35% 30%, #ff4848 0 14%, transparent 15%),
-    radial-gradient(circle at 65% 30%, #ff4848 0 14%, transparent 15%),
-    radial-gradient(circle at 50% 60%, #111 0 20%, transparent 21%),
-    linear-gradient(145deg, #ff3030, #8b0000);
-  border: 4px solid white;
+    radial-gradient(
+      circle at 35% 31%,
+      white 0 5%,
+      transparent 6%
+    ),
+
+    radial-gradient(
+      circle at 65% 31%,
+      white 0 5%,
+      transparent 6%
+    ),
+
+    radial-gradient(
+      circle at 35% 31%,
+      #ff5555 0 14%,
+      transparent 15%
+    ),
+
+    radial-gradient(
+      circle at 65% 31%,
+      #ff5555 0 14%,
+      transparent 15%
+    ),
+
+    radial-gradient(
+      circle at 50% 62%,
+      #111 0 21%,
+      transparent 22%
+    ),
+
+    linear-gradient(
+      145deg,
+      #ff3535,
+      #760000
+    );
+
   box-shadow:
     0 0 10px #ff2222,
-    0 0 30px #ff0000;
+    0 0 28px #ff0000;
 }
 
-.enemy::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 95px;
-  height: 95px;
-  border: 2px solid rgba(255,255,255,.45);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
+.enemy:after{
+  content:"";
+
+  position:absolute;
+
+  inset:-12px;
+
+  border:
+    2px solid
+    rgba(255,255,255,.4);
+
+  border-radius:50%;
 }
 
-.crosshair {
-  position: absolute;
-  width: 54px;
-  height: 54px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 40;
-  opacity: .9;
+/* ボス */
+
+.enemy.boss{
+  width:130px;
+  height:130px;
 }
 
-.crosshair::before,
-.crosshair::after {
-  content: "";
-  position: absolute;
-  background: white;
-  box-shadow: 0 0 5px #000;
+.enemy.boss .enemyBody{
+  border-width:5px;
+
+  box-shadow:
+    0 0 15px #ff2222,
+    0 0 50px #ff0000;
 }
 
-.crosshair::before {
-  width: 54px;
-  height: 2px;
-  top: 26px;
-  left: 0;
+/* ボスHP */
+
+.hp{
+  position:absolute;
+
+  left:50%;
+  top:-17px;
+
+  transform:
+    translateX(-50%);
+
+  width:100%;
+  height:8px;
+
+  background:#111;
+
+  border:
+    1px solid white;
+
+  border-radius:10px;
+
+  overflow:hidden;
 }
 
-.crosshair::after {
-  width: 2px;
-  height: 54px;
-  left: 26px;
-  top: 0;
+.hp i{
+  display:block;
+
+  height:100%;
+
+  width:100%;
+
+  background:#32ff4b;
 }
 
-.hit {
-  position: absolute;
-  pointer-events: none;
-  z-index: 45;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  font-size: 25px;
-  font-weight: 900;
+/* 弾 */
+
+.shot{
+  position:absolute;
+
+  z-index:45;
+
+  width:8px;
+  height:8px;
+
+  border-radius:50%;
+
+  background:white;
+
+  box-shadow:
+    0 0 12px 5px #ffe600;
+
+  transform:
+    translate(-50%,-50%);
+
+  pointer-events:none;
+}
+
+/* ヒット文字 */
+
+.hit{
+  position:absolute;
+
+  z-index:55;
+
+  transform:
+    translate(-50%,-50%);
+
+  font-size:25px;
+
+  font-weight:1000;
+
+  color:white;
+
   text-shadow:
-    0 0 5px #ff0000,
-    0 2px 5px #000;
-  animation: hitAnim .55s forwards;
+    0 0 8px #f00,
+    0 2px 4px #000;
+
+  pointer-events:none;
+
+  animation:
+    hitAnim .6s forwards;
 }
 
-.muzzle {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle,
-    white 0 10%,
-    #ffe600 15%,
-    #ff5500 35%,
-    transparent 70%);
-  pointer-events: none;
-  z-index: 44;
-  animation: muzzleAnim .18s forwards;
+/* 爆発 */
+
+.explosion{
+  position:absolute;
+
+  z-index:54;
+
+  width:20px;
+  height:20px;
+
+  border:
+    4px solid white;
+
+  border-radius:50%;
+
+  transform:
+    translate(-50%,-50%);
+
+  pointer-events:none;
+
+  animation:
+    explosionAnim .42s forwards;
 }
 
-#startScreen,
-#gameOver {
-  position: absolute;
-  inset: 0;
-  z-index: 100;
+/* WAVE文字 */
+
+#banner{
+  position:absolute;
+
+  z-index:60;
+
+  left:50%;
+  top:22%;
+
+  transform:
+    translate(-50%,-50%);
+
+  color:white;
+
+  font-size:32px;
+
+  font-weight:1000;
+
+  text-shadow:
+    0 0 12px #000;
+
+  opacity:0;
+
+  pointer-events:none;
+
+  white-space:nowrap;
+}
+
+/* メニュー */
+
+.overlay{
+  position:absolute;
+
+  z-index:100;
+
+  inset:0;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:24px;
+
+  text-align:center;
+
+  color:white;
+
   background:
     linear-gradient(
       rgba(0,0,0,.72),
-      rgba(0,0,0,.82)
+      rgba(0,0,0,.9)
     );
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 25px;
 }
 
-.panel {
-  width: min(420px, 90vw);
+.panel{
+  width:min(430px,92vw);
 }
 
-.logo {
-  font-size: 43px;
-  font-weight: 1000;
-  letter-spacing: -2px;
-  margin-bottom: 5px;
+.logo{
+  font-size:43px;
+
+  line-height:.9;
+
+  font-weight:1000;
+
+  letter-spacing:-2px;
 }
 
-.sub {
-  color: #bbb;
-  margin-bottom: 28px;
+.sub{
+  margin:
+    14px 0 26px;
+
+  color:#ddd;
+
+  line-height:1.5;
 }
 
-button {
-  width: 100%;
-  min-height: 56px;
-  border: 0;
-  border-radius: 16px;
-  background: #e60000;
-  color: white;
-  font-size: 20px;
-  font-weight: 900;
-  box-shadow: 0 7px 0 #800000;
-  touch-action: manipulation;
+button{
+  width:100%;
+
+  min-height:58px;
+
+  border:0;
+
+  border-radius:16px;
+
+  background:#e00000;
+
+  color:white;
+
+  font-size:19px;
+
+  font-weight:1000;
+
+  box-shadow:
+    0 6px 0 #780000;
+
+  touch-action:manipulation;
 }
 
-button:active {
-  transform: translateY(5px);
-  box-shadow: 0 2px 0 #800000;
+button:active{
+  transform:
+    translateY(4px);
+
+  box-shadow:
+    0 2px 0 #780000;
 }
 
-.small {
-  margin-top: 18px;
-  color: #999;
-  font-size: 13px;
-  line-height: 1.6;
+button.secondary{
+  margin-top:12px;
+
+  background:#222;
+
+  box-shadow:
+    0 6px 0 #111;
 }
 
-#gameOver {
-  display: none;
+.small{
+  margin-top:18px;
+
+  color:#aaa;
+
+  font-size:13px;
+
+  line-height:1.6;
 }
 
-.finalScore {
-  font-size: 50px;
-  font-weight: 1000;
-  margin: 15px 0 25px;
+.stat{
+  font-size:52px;
+
+  font-weight:1000;
+
+  margin:15px 0;
 }
 
-@keyframes enemyFloat {
-  from {
-    transform: translate(-50%, -50%) scale(.96);
-  }
-  to {
-    transform: translate(-50%, -50%) scale(1.04);
-  }
+.rank{
+  color:#ffe600;
+
+  font-size:18px;
+
+  font-weight:900;
+
+  margin-bottom:20px;
 }
 
-@keyframes hitAnim {
-  0% {
-    opacity: 1;
+/* アニメーション */
+
+@keyframes hitAnim{
+
+  0%{
+    opacity:1;
+
     transform:
-      translate(-50%, -50%)
+      translate(-50%,-50%)
       scale(.7);
   }
 
-  100% {
-    opacity: 0;
+  100%{
+    opacity:0;
+
     transform:
-      translate(-50%, -100px)
+      translate(-50%,-100px)
       scale(1.5);
   }
+
 }
 
-@keyframes muzzleAnim {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(.3);
+@keyframes explosionAnim{
+
+  0%{
+    opacity:1;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.2);
   }
 
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.5);
+  100%{
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(5);
+
+    border-color:#ff4a00;
   }
+
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .enemy {
-    animation: none;
-  }
-
-  .hit,
-  .muzzle {
-    animation-duration: .01s;
-  }
-}
 </style>
 </head>
+
 
 <body>
 
 <div id="game">
 
-  <video id="camera"
-         autoplay
-         muted
-         playsinline></video>
+  <!-- カメラ -->
+
+  <video
+    id="camera"
+    autoplay
+    muted
+    playsinline>
+  </video>
+
+
+  <!-- ゲーム -->
 
   <div id="gameLayer"></div>
 
+
+  <!-- HUD -->
+
   <div id="hud">
-    <div class="hudBox">
+
+    <div class="hudLeft">
+
       SCORE
-      <div id="score">0</div>
-      <div id="combo">COMBO ×1</div>
+
+      <div id="score">
+        0
+      </div>
+
+      <div id="combo">
+        COMBO ×1
+      </div>
+
     </div>
 
-    <div class="hudBox">
-      <div id="time">30</div>
-      <div id="lives">❤️❤️❤️</div>
+
+    <div class="hudRight">
+
+      <div id="time">
+        45
+      </div>
+
+      <div id="lives">
+        ❤️❤️❤️
+      </div>
+
     </div>
+
   </div>
 
-  <div class="crosshair"
-       id="crosshair"
-       style="left:50%;top:50%;">
+
+  <!-- 照準 -->
+
+  <div
+    id="crosshair"
+    style="left:50%;top:50%">
   </div>
 
-  <div id="startScreen">
+
+  <!-- WAVE -->
+
+  <div id="banner"></div>
+
+
+  <!-- START -->
+
+  <section
+    id="start"
+    class="overlay">
+
     <div class="panel">
 
       <div class="logo">
-        CAMERA<br>HUNTER
+        CAMERA<br>
+        HUNTER 2
       </div>
 
       <div class="sub">
-        現実世界に出現する敵を撃て。
+        現実の景色に侵入した敵を撃ち落とせ。
       </div>
 
       <button id="startButton">
-        📷 GAME START
+        📷 カメラを起動してSTART
       </button>
 
       <div class="small">
-        カメラの使用許可が表示されたら<br>
-        「許可」を選択してください。<br><br>
-        30秒間で何体倒せる？
+        カメラの使用許可が表示されたら
+        「許可」を押してください。
+        <br><br>
+        45秒間で何体倒せる？
       </div>
 
     </div>
-  </div>
 
-  <div id="gameOver">
+  </section>
+
+
+  <!-- CAMERA ERROR -->
+
+  <section
+    id="cameraError"
+    class="overlay"
+    style="display:none">
+
+    <div class="panel">
+
+      <div class="logo">
+        CAMERA ERROR
+      </div>
+
+      <div class="sub">
+        カメラを利用できませんでした。
+        <br><br>
+        HTTPSのページで開いているか、
+        Safariのカメラ設定を確認してください。
+      </div>
+
+      <button id="cameraRetry">
+        もう一度試す
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- GAME OVER -->
+
+  <section
+    id="gameOver"
+    class="overlay"
+    style="display:none">
+
     <div class="panel">
 
       <div class="logo">
         GAME OVER
       </div>
 
-      <div class="finalScore"
-           id="finalScore">
+      <div
+        class="stat"
+        id="finalScore">
         0
       </div>
 
-      <button id="restartButton">
-        🔥 RETRY
+      <div
+        class="rank"
+        id="rank">
+        RANK C
+      </div>
+
+      <button id="retryButton">
+        🔥 もう一度
+      </button>
+
+      <button
+        id="stopButton"
+        class="secondary">
+        カメラを停止
       </button>
 
     </div>
-  </div>
+
+  </section>
 
 </div>
 
+
 <script>
 
-const camera = document.getElementById("camera");
-const gameLayer = document.getElementById("gameLayer");
+"use strict";
 
-const startScreen = document.getElementById("startScreen");
-const gameOver = document.getElementById("gameOver");
 
-const startButton = document.getElementById("startButton");
-const restartButton = document.getElementById("restartButton");
+/* =========================
+   DOM
+========================= */
 
-const scoreEl = document.getElementById("score");
-const comboEl = document.getElementById("combo");
-const timeEl = document.getElementById("time");
-const livesEl = document.getElementById("lives");
-const finalScoreEl = document.getElementById("finalScore");
+const camera =
+  document.getElementById(
+    "camera"
+  );
 
-let score = 0;
-let combo = 0;
-let lives = 3;
-let timeLeft = 30;
+const gameLayer =
+  document.getElementById(
+    "gameLayer"
+  );
+
+const start =
+  document.getElementById(
+    "start"
+  );
+
+const cameraError =
+  document.getElementById(
+    "cameraError"
+  );
+
+const gameOver =
+  document.getElementById(
+    "gameOver"
+  );
+
+const startButton =
+  document.getElementById(
+    "startButton"
+  );
+
+const cameraRetry =
+  document.getElementById(
+    "cameraRetry"
+  );
+
+const retryButton =
+  document.getElementById(
+    "retryButton"
+  );
+
+const stopButton =
+  document.getElementById(
+    "stopButton"
+  );
+
+const scoreElement =
+  document.getElementById(
+    "score"
+  );
+
+const comboElement =
+  document.getElementById(
+    "combo"
+  );
+
+const timeElement =
+  document.getElementById(
+    "time"
+  );
+
+const livesElement =
+  document.getElementById(
+    "lives"
+  );
+
+const finalScoreElement =
+  document.getElementById(
+    "finalScore"
+  );
+
+const rankElement =
+  document.getElementById(
+    "rank"
+  );
+
+const banner =
+  document.getElementById(
+    "banner"
+  );
+
+const crosshair =
+  document.getElementById(
+    "crosshair"
+  );
+
+
+/* =========================
+   GAME STATE
+========================= */
+
+let stream = null;
 
 let playing = false;
-let timer = null;
-let enemyTimer = null;
 
-let enemies = [];
+let score = 0;
 
-let difficulty = 1;
+let combo = 0;
 
-function updateHUD() {
+let lives = 3;
 
-  scoreEl.textContent = score;
+let timeLeft = 45;
 
-  comboEl.textContent =
-    "COMBO ×" + Math.max(1, combo);
+let elapsed = 0;
 
-  timeEl.textContent =
+let enemyId = 0;
+
+let spawnTimer = null;
+
+let gameTimer = null;
+
+let animationFrame = null;
+
+let lastFrame = 0;
+
+const enemies =
+  new Map();
+
+
+/* =========================
+   HUD
+========================= */
+
+function updateHUD(){
+
+  scoreElement.textContent =
+    score.toLocaleString();
+
+  comboElement.textContent =
+    "COMBO ×" +
+    Math.max(1,combo);
+
+  timeElement.textContent =
     timeLeft;
 
-  livesEl.textContent =
+  livesElement.textContent =
     "❤️".repeat(lives) +
-    "🖤".repeat(3 - lives);
-}
-
-async function startCamera() {
-
-  if (!navigator.mediaDevices ||
-      !navigator.mediaDevices.getUserMedia) {
-
-    alert(
-      "このブラウザではカメラを利用できません。"
+    "🖤".repeat(
+      3 - lives
     );
 
-    return false;
+}
+
+
+/* =========================
+   CAMERA
+========================= */
+
+function stopCamera(){
+
+  if(stream){
+
+    stream
+      .getTracks()
+      .forEach(track =>
+        track.stop()
+      );
+
+    stream = null;
+
   }
 
-  try {
+  camera.srcObject = null;
 
-    const stream =
-      await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: {
-            ideal: "environment"
-          }
-        },
-        audio: false
-      });
+}
 
-    camera.srcObject = stream;
+
+async function startCamera(){
+
+  cameraError.style.display =
+    "none";
+
+  try{
+
+    if(
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ){
+
+      throw new Error(
+        "Camera API unavailable"
+      );
+
+    }
+
+
+    stopCamera();
+
+
+    stream =
+      await navigator.mediaDevices
+        .getUserMedia({
+
+          video:{
+            facingMode:{
+              ideal:"environment"
+            },
+
+            width:{
+              ideal:1280
+            },
+
+            height:{
+              ideal:720
+            }
+
+          },
+
+          audio:false
+
+        });
+
+
+    camera.srcObject =
+      stream;
+
 
     await camera.play();
 
+
     return true;
 
-  } catch (error) {
 
-    alert(
-      "カメラを使用できませんでした。\n\n" +
-      "Safariのサイト設定からカメラを許可してください。"
-    );
+  }catch(error){
+
+    cameraError.style.display =
+      "flex";
 
     return false;
+
   }
+
 }
 
-function randomPosition() {
 
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+/* =========================
+   RANDOM POSITION
+========================= */
 
-  const marginX = 65;
-  const marginTop = 100;
-  const marginBottom = 90;
+function randomPosition(){
 
-  return {
+  const width =
+    window.innerWidth;
+
+  const height =
+    window.innerHeight;
+
+
+  const marginX = 60;
+
+  const top = 110;
+
+  const bottom = 90;
+
+
+  return{
+
     x:
       marginX +
       Math.random() *
-      Math.max(1, w - marginX * 2),
+      Math.max(
+        1,
+        width -
+        marginX * 2
+      ),
 
     y:
-      marginTop +
+      top +
       Math.random() *
       Math.max(
         1,
-        h - marginTop - marginBottom
+        height -
+        top -
+        bottom
       )
+
   };
+
 }
 
-function createEnemy() {
 
-  if (!playing) return;
+/* =========================
+   DIFFICULTY
+========================= */
 
-  const pos = randomPosition();
+function difficulty(){
 
-  const enemy = document.createElement("div");
-
-  enemy.className = "enemy";
-
-  const body =
-    document.createElement("div");
-
-  body.className = "enemyBody";
-
-  enemy.appendChild(body);
-
-  enemy.style.left = pos.x + "px";
-  enemy.style.top = pos.y + "px";
-
-  const size =
-    Math.max(
-      45,
-      76 - difficulty * 3
+  return 1 +
+    Math.floor(
+      elapsed / 7
     );
 
-  enemy.style.width =
-    size + "px";
+}
 
-  enemy.style.height =
-    size + "px";
 
-  enemy.dataset.x = pos.x;
-  enemy.dataset.y = pos.y;
+/* =========================
+   CREATE ENEMY
+========================= */
 
-  enemy.addEventListener(
-    "pointerdown",
-    function(e) {
+function createEnemy(
+  forceBoss = false
+){
 
-      e.preventDefault();
-      e.stopPropagation();
+  if(!playing)
+    return;
 
-      shootEnemy(enemy);
 
-    },
+  const d =
+    difficulty();
+
+
+  const boss =
+    forceBoss ||
+    (
+      elapsed > 0 &&
+      elapsed % 20 === 0 &&
+      Math.random() < .3
+    );
+
+
+  const pos =
+    randomPosition();
+
+
+  const enemy =
+    document.createElement(
+      "div"
+    );
+
+
+  enemy.className =
+    boss
+      ? "enemy boss"
+      : "enemy";
+
+
+  enemy.style.left =
+    pos.x + "px";
+
+
+  enemy.style.top =
+    pos.y + "px";
+
+
+  enemy.dataset.x =
+    pos.x;
+
+
+  enemy.dataset.y =
+    pos.y;
+
+
+  const body =
+    document.createElement(
+      "div"
+    );
+
+
+  body.className =
+    "enemyBody";
+
+
+  enemy.appendChild(
+    body
+  );
+
+
+  let hp =
+    boss ? 3 : 1;
+
+
+  if(boss){
+
+    const hpBar =
+      document.createElement(
+        "div"
+      );
+
+
+    hpBar.className =
+      "hp";
+
+
+    const hpFill =
+      document.createElement(
+        "i"
+      );
+
+
+    hpBar.appendChild(
+      hpFill
+    );
+
+
+    enemy.appendChild(
+      hpBar
+    );
+
+
+    enemy.hpFill =
+      hpFill;
+
+  }
+
+
+  const id =
+    ++enemyId;
+
+
+  enemy.dataset.id =
+    id;
+
+
+  gameLayer.appendChild(
+    enemy
+  );
+
+
+  enemies.set(
+    id,
     {
-      passive: false
+
+      element:enemy,
+
+      x:pos.x,
+
+      y:pos.y,
+
+      hp:hp,
+
+      boss:boss,
+
+      vx:
+        (
+          Math.random() -
+          .5
+        ) *
+        (d * 3),
+
+      vy:
+        (
+          Math.random() -
+          .5
+        ) *
+        (d * 2)
+
     }
   );
 
-  gameLayer.appendChild(enemy);
 
-  enemies.push(enemy);
+  enemy.addEventListener(
+    "pointerdown",
+    function(event){
 
-  const lifeTime =
-    Math.max(
-      700,
-      1800 - difficulty * 100
-    );
+      event.preventDefault();
 
-  setTimeout(() => {
+      event.stopPropagation();
 
-    if (!enemy.isConnected) return;
+      shootEnemy(
+        id,
+        event.clientX,
+        event.clientY
+      );
 
-    if (playing) {
-
-      missEnemy(enemy);
-
+    },
+    {
+      passive:false
     }
+  );
 
-  }, lifeTime);
+
+  const lifetime =
+    boss
+      ? 5500
+      : Math.max(
+          800,
+          2100 -
+          d * 120
+        );
+
+
+  setTimeout(
+    function(){
+
+      if(
+        enemies.has(id) &&
+        playing
+      ){
+
+        missEnemy(id);
+
+      }
+
+    },
+    lifetime
+  );
+
 }
 
-function shootEnemy(enemy) {
 
-  if (!playing) return;
+/* =========================
+   SHOOT ENEMY
+========================= */
 
-  const x =
-    parseFloat(enemy.dataset.x);
+function shootEnemy(
+  id,
+  shotX,
+  shotY
+){
 
-  const y =
-    parseFloat(enemy.dataset.y);
+  if(!playing)
+    return;
+
+
+  const enemy =
+    enemies.get(id);
+
+
+  if(!enemy)
+    return;
+
+
+  createShot(
+    shotX,
+    shotY,
+    enemy.x,
+    enemy.y
+  );
+
+
+  enemy.hp--;
+
+
+  if(
+    enemy.boss &&
+    enemy.hpFill
+  ){
+
+    enemy.hpFill.style.width =
+      Math.max(
+        0,
+        enemy.hp / 3 * 100
+      ) + "%";
+
+  }
+
+
+  if(enemy.hp > 0){
+
+    combo++;
+
+    score +=
+      50 *
+      Math.max(
+        1,
+        combo
+      );
+
+
+    showHit(
+      enemy.x,
+      enemy.y,
+      "HIT!"
+    );
+
+
+    updateHUD();
+
+    return;
+
+  }
+
 
   const points =
-    100 *
-    Math.max(1, combo + 1);
+    enemy.boss
 
-  score += points;
+      ? 1000 *
+        Math.max(
+          1,
+          combo + 1
+        )
+
+      : 100 *
+        Math.max(
+          1,
+          combo + 1
+        );
+
+
+  score +=
+    points;
+
 
   combo++;
 
-  if (navigator.vibrate) {
-    navigator.vibrate(25);
+
+  if(
+    navigator.vibrate
+  ){
+
+    navigator.vibrate(
+      enemy.boss
+        ? [40,25,70]
+        : 20
+    );
+
   }
 
-  createHit(x, y, "+" + points);
 
-  enemy.remove();
+  showHit(
+    enemy.x,
+    enemy.y,
+    "+" + points
+  );
 
-  enemies =
-    enemies.filter(
-      e => e !== enemy
+
+  createExplosion(
+    enemy.x,
+    enemy.y,
+    enemy.boss
+      ? 110
+      : 65
+  );
+
+
+  enemy.element.remove();
+
+
+  enemies.delete(id);
+
+
+  if(enemy.boss){
+
+    showBanner(
+      "BOSS DOWN!"
     );
+
+  }
+
 
   updateHUD();
+
 }
 
-function missEnemy(enemy) {
 
-  if (!enemy.isConnected) return;
+/* =========================
+   MISS
+========================= */
 
-  enemy.remove();
+function missEnemy(id){
 
-  enemies =
-    enemies.filter(
-      e => e !== enemy
-    );
+  const enemy =
+    enemies.get(id);
+
+
+  if(!enemy)
+    return;
+
+
+  enemy.element.remove();
+
+
+  enemies.delete(id);
+
 
   lives--;
 
   combo = 0;
 
+
+  if(
+    navigator.vibrate
+  ){
+
+    navigator.vibrate(80);
+
+  }
+
+
   updateHUD();
 
-  if (lives <= 0) {
+
+  if(lives <= 0){
 
     endGame();
 
   }
+
 }
 
-function createHit(x, y, text) {
 
-  const hit =
-    document.createElement("div");
+/* =========================
+   SHOT
+========================= */
 
-  hit.className = "hit";
+function createShot(
+  startX,
+  startY,
+  endX,
+  endY
+){
 
-  hit.textContent = text;
+  const shot =
+    document.createElement(
+      "div"
+    );
 
-  hit.style.left = x + "px";
-  hit.style.top = y + "px";
 
-  gameLayer.appendChild(hit);
+  shot.className =
+    "shot";
 
-  setTimeout(() => {
-    hit.remove();
-  }, 600);
 
-  const muzzle =
-    document.createElement("div");
+  shot.style.left =
+    startX + "px";
 
-  muzzle.className = "muzzle";
 
-  muzzle.style.left = x + "px";
-  muzzle.style.top = y + "px";
+  shot.style.top =
+    startY + "px";
 
-  gameLayer.appendChild(muzzle);
 
-  setTimeout(() => {
-    muzzle.remove();
-  }, 200);
-}
+  gameLayer.appendChild(
+    shot
+  );
 
-function playerShoot(x, y) {
 
-  if (!playing) return;
+  requestAnimationFrame(
+    function(){
 
-  /*
-    敵を直接タップできない場合でも、
-    タップ位置の近くに敵がいれば命中。
-  */
+      shot.style.transition =
+        "left .12s linear," +
+        "top .12s linear";
 
-  let closest = null;
-  let distance = Infinity;
 
-  enemies.forEach(enemy => {
+      shot.style.left =
+        endX + "px";
 
-    const ex =
-      parseFloat(enemy.dataset.x);
 
-    const ey =
-      parseFloat(enemy.dataset.y);
-
-    const d =
-      Math.hypot(
-        ex - x,
-        ey - y
-      );
-
-    if (d < distance) {
-
-      distance = d;
-      closest = enemy;
+      shot.style.top =
+        endY + "px";
 
     }
+  );
 
-  });
 
-  if (closest &&
-      distance < 65) {
+  setTimeout(
+    function(){
 
-    shootEnemy(closest);
+      shot.remove();
 
-  } else {
+    },
+    150
+  );
+
+}
+
+
+/* =========================
+   HIT
+========================= */
+
+function showHit(
+  x,
+  y,
+  text
+){
+
+  const hit =
+    document.createElement(
+      "div"
+    );
+
+
+  hit.className =
+    "hit";
+
+
+  hit.textContent =
+    text;
+
+
+  hit.style.left =
+    x + "px";
+
+
+  hit.style.top =
+    y + "px";
+
+
+  gameLayer.appendChild(
+    hit
+  );
+
+
+  setTimeout(
+    function(){
+
+      hit.remove();
+
+    },
+    650
+  );
+
+}
+
+
+/* =========================
+   EXPLOSION
+========================= */
+
+function createExplosion(
+  x,
+  y,
+  size
+){
+
+  const explosion =
+    document.createElement(
+      "div"
+    );
+
+
+  explosion.className =
+    "explosion";
+
+
+  explosion.style.width =
+    size + "px";
+
+
+  explosion.style.height =
+    size + "px";
+
+
+  explosion.style.left =
+    x + "px";
+
+
+  explosion.style.top =
+    y + "px";
+
+
+  gameLayer.appendChild(
+    explosion
+  );
+
+
+  setTimeout(
+    function(){
+
+      explosion.remove();
+
+    },
+    450
+  );
+
+}
+
+
+/* =========================
+   BANNER
+========================= */
+
+let bannerTimer = null;
+
+
+function showBanner(
+  text
+){
+
+  banner.textContent =
+    text;
+
+
+  banner.style.opacity =
+    "1";
+
+
+  clearTimeout(
+    bannerTimer
+  );
+
+
+  bannerTimer =
+    setTimeout(
+      function(){
+
+        banner.style.opacity =
+          "0";
+
+      },
+      900
+    );
+
+}
+
+
+/* =========================
+   GAME LOOP
+========================= */
+
+function gameLoop(
+  timestamp
+){
+
+  if(!playing)
+    return;
+
+
+  const delta =
+    Math.min(
+      .04,
+      (
+        timestamp -
+        lastFrame
+      ) / 1000 || 0
+    );
+
+
+  lastFrame =
+    timestamp;
+
+
+  enemies.forEach(
+    function(enemy){
+
+      enemy.x +=
+        enemy.vx *
+        delta;
+
+
+      enemy.y +=
+        enemy.vy *
+        delta;
+
+
+      const margin =
+        enemy.boss
+          ? 75
+          : 45;
+
+
+      if(
+        enemy.x < margin ||
+        enemy.x >
+        window.innerWidth -
+        margin
+      ){
+
+        enemy.vx *= -1;
+
+      }
+
+
+      if(
+        enemy.y < 110 ||
+        enemy.y >
+        window.innerHeight -
+        90
+      ){
+
+        enemy.vy *= -1;
+
+      }
+
+
+      enemy.element.style.left =
+        enemy.x + "px";
+
+
+      enemy.element.style.top =
+        enemy.y + "px";
+
+
+      enemy.element.dataset.x =
+        enemy.x;
+
+
+      enemy.element.dataset.y =
+        enemy.y;
+
+    }
+  );
+
+
+  animationFrame =
+    requestAnimationFrame(
+      gameLoop
+    );
+
+}
+
+
+/* =========================
+   PLAYER SHOOT
+========================= */
+
+function playerShoot(
+  x,
+  y
+){
+
+  if(!playing)
+    return;
+
+
+  let target = null;
+
+  let nearest =
+    Infinity;
+
+
+  enemies.forEach(
+    function(enemy,id){
+
+      const radius =
+        enemy.boss
+          ? 90
+          : 62;
+
+
+      const distance =
+        Math.hypot(
+          enemy.x - x,
+          enemy.y - y
+        );
+
+
+      if(
+        distance < radius &&
+        distance < nearest
+      ){
+
+        nearest =
+          distance;
+
+        target =
+          id;
+
+      }
+
+    }
+  );
+
+
+  if(target !== null){
+
+    shootEnemy(
+      target,
+      x,
+      y
+    );
+
+  }else{
 
     combo = 0;
 
-    createHit(x, y, "MISS");
+    showHit(
+      x,
+      y,
+      "MISS"
+    );
 
     updateHUD();
 
   }
+
 }
+
+
+/* =========================
+   TOUCH
+========================= */
 
 gameLayer.addEventListener(
   "pointerdown",
-  function(e) {
+  function(event){
 
-    if (!playing) return;
+    if(!playing)
+      return;
+
 
     playerShoot(
-      e.clientX,
-      e.clientY
+      event.clientX,
+      event.clientY
     );
 
   },
   {
-    passive: false
+    passive:false
   }
 );
 
-function startGame() {
+
+/* =========================
+   CROSSHAIR
+========================= */
+
+document.addEventListener(
+  "pointermove",
+  function(event){
+
+    if(!playing)
+      return;
+
+
+    crosshair.style.left =
+      event.clientX + "px";
+
+
+    crosshair.style.top =
+      event.clientY + "px";
+
+  },
+  {
+    passive:true
+  }
+);
+
+
+/* =========================
+   START
+========================= */
+
+function startGame(){
+
+  clearInterval(
+    spawnTimer
+  );
+
+  clearInterval(
+    gameTimer
+  );
+
+
+  cancelAnimationFrame(
+    animationFrame
+  );
+
+
+  enemies.forEach(
+    enemy =>
+      enemy.element.remove()
+  );
+
+
+  enemies.clear();
+
 
   score = 0;
+
   combo = 0;
+
   lives = 3;
-  timeLeft = 30;
-  difficulty = 1;
 
-  enemies.forEach(e => e.remove());
+  timeLeft = 45;
 
-  enemies = [];
+  elapsed = 0;
 
-  updateHUD();
-
-  startScreen.style.display = "none";
-  gameOver.style.display = "none";
 
   playing = true;
 
+
+  start.style.display =
+    "none";
+
+
+  gameOver.style.display =
+    "none";
+
+
+  cameraError.style.display =
+    "none";
+
+
+  updateHUD();
+
+
   createEnemy();
+
   createEnemy();
 
-  enemyTimer =
-    setInterval(() => {
 
-      if (!playing) return;
+  spawnTimer =
+    setInterval(
+      function(){
 
-      createEnemy();
+        if(!playing)
+          return;
 
-      if (difficulty > 3) {
+
         createEnemy();
-      }
 
-    }, 850);
 
-  timer =
-    setInterval(() => {
+        if(
+          difficulty() >= 4 &&
+          Math.random() < .35
+        ){
 
-      if (!playing) return;
+          createEnemy();
 
-      timeLeft--;
+        }
 
-      difficulty =
-        1 +
-        Math.floor(
-          (30 - timeLeft) / 5
-        );
 
-      updateHUD();
+        if(
+          timeLeft === 30 ||
+          timeLeft === 15
+        ){
 
-      if (timeLeft <= 0) {
+          createEnemy(true);
 
-        endGame();
+        }
 
-      }
+      },
+      850
+    );
 
-    }, 1000);
+
+  gameTimer =
+    setInterval(
+      function(){
+
+        if(!playing)
+          return;
+
+
+        timeLeft--;
+
+        elapsed++;
+
+
+        if(timeLeft === 30){
+
+          showBanner(
+            "WAVE 2"
+          );
+
+        }
+
+
+        if(timeLeft === 15){
+
+          showBanner(
+            "FINAL WAVE"
+          );
+
+        }
+
+
+        updateHUD();
+
+
+        if(
+          timeLeft <= 0
+        ){
+
+          endGame();
+
+        }
+
+      },
+      1000
+    );
+
+
+  lastFrame =
+    performance.now();
+
+
+  animationFrame =
+    requestAnimationFrame(
+      gameLoop
+    );
+
 }
 
-function endGame() {
 
-  if (!playing) return;
+/* =========================
+   END GAME
+========================= */
+
+function getRank(
+  score
+){
+
+  if(score >= 12000)
+    return "RANK S";
+
+  if(score >= 8000)
+    return "RANK A";
+
+  if(score >= 5000)
+    return "RANK B";
+
+  return "RANK C";
+
+}
+
+
+function endGame(){
+
+  if(!playing)
+    return;
+
 
   playing = false;
 
-  clearInterval(timer);
-  clearInterval(enemyTimer);
 
-  timer = null;
-  enemyTimer = null;
+  clearInterval(
+    spawnTimer
+  );
 
-  enemies.forEach(e => e.remove());
 
-  enemies = [];
+  clearInterval(
+    gameTimer
+  );
 
-  finalScoreEl.textContent =
-    score;
+
+  cancelAnimationFrame(
+    animationFrame
+  );
+
+
+  spawnTimer = null;
+
+  gameTimer = null;
+
+
+  enemies.forEach(
+    enemy =>
+      enemy.element.remove()
+  );
+
+
+  enemies.clear();
+
+
+  finalScoreElement.textContent =
+    score.toLocaleString();
+
+
+  rankElement.textContent =
+    getRank(score);
+
 
   gameOver.style.display =
     "flex";
+
 }
+
+
+/* =========================
+   BUTTONS
+========================= */
 
 startButton.addEventListener(
   "click",
-  async () => {
+  async function(){
 
-    startButton.disabled = true;
+    startButton.disabled =
+      true;
 
-    const ok =
+
+    const cameraOK =
       await startCamera();
 
-    startButton.disabled = false;
 
-    if (ok) {
+    startButton.disabled =
+      false;
+
+
+    if(cameraOK){
+
       startGame();
+
     }
 
   }
 );
 
-restartButton.addEventListener(
+
+cameraRetry.addEventListener(
   "click",
-  async () => {
+  async function(){
 
-    if (!camera.srcObject) {
+    const cameraOK =
+      await startCamera();
 
-      const ok =
-        await startCamera();
 
-      if (!ok) return;
+    if(cameraOK){
+
+      startGame();
 
     }
+
+  }
+);
+
+
+retryButton.addEventListener(
+  "click",
+  async function(){
+
+    if(!stream){
+
+      const cameraOK =
+        await startCamera();
+
+
+      if(!cameraOK)
+        return;
+
+    }
+
 
     startGame();
 
   }
 );
 
-window.addEventListener(
-  "resize",
-  () => {
 
-    document.body.style.height =
-      window.innerHeight + "px";
+stopButton.addEventListener(
+  "click",
+  function(){
+
+    endGame();
+
+    stopCamera();
+
+
+    gameOver.style.display =
+      "none";
+
+
+    start.style.display =
+      "flex";
 
   }
 );
+
+
+/* =========================
+   INIT
+========================= */
 
 updateHUD();
 
