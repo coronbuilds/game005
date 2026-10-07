@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1,
+               maximum-scale=1,
+               user-scalable=no,
+               viewport-fit=cover">
+
+<title>CAMERA HUNTER</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #050505;
+  font-family: Arial, sans-serif;
+  touch-action: manipulation;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+#camera {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #111;
+}
+
+#gameLayer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+#hud {
+  position: absolute;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  height: 75px;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  color: white;
+  pointer-events: none;
+  z-index: 50;
+  text-shadow: 0 2px 4px #000;
+}
+
+.hudBox {
+  font-weight: 900;
+  font-size: 16px;
+}
+
+#score {
+  font-size: 25px;
+}
+
+#combo {
+  color: #ffe600;
+  font-size: 18px;
+}
+
+#time {
+  font-size: 25px;
+  text-align: right;
+}
+
+#lives {
+  font-size: 18px;
+  text-align: right;
+}
+
+.enemy {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  animation: enemyFloat .8s infinite alternate ease-in-out;
+}
+
+.enemyBody {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, #fff 0 5%, transparent 6%),
+    radial-gradient(circle at 65% 30%, #fff 0 5%, transparent 6%),
+    radial-gradient(circle at 35% 30%, #ff4848 0 14%, transparent 15%),
+    radial-gradient(circle at 65% 30%, #ff4848 0 14%, transparent 15%),
+    radial-gradient(circle at 50% 60%, #111 0 20%, transparent 21%),
+    linear-gradient(145deg, #ff3030, #8b0000);
+  border: 4px solid white;
+  box-shadow:
+    0 0 10px #ff2222,
+    0 0 30px #ff0000;
+}
+
+.enemy::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 95px;
+  height: 95px;
+  border: 2px solid rgba(255,255,255,.45);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.crosshair {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 40;
+  opacity: .9;
+}
+
+.crosshair::before,
+.crosshair::after {
+  content: "";
+  position: absolute;
+  background: white;
+  box-shadow: 0 0 5px #000;
+}
+
+.crosshair::before {
+  width: 54px;
+  height: 2px;
+  top: 26px;
+  left: 0;
+}
+
+.crosshair::after {
+  width: 2px;
+  height: 54px;
+  left: 26px;
+  top: 0;
+}
+
+.hit {
+  position: absolute;
+  pointer-events: none;
+  z-index: 45;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 25px;
+  font-weight: 900;
+  text-shadow:
+    0 0 5px #ff0000,
+    0 2px 5px #000;
+  animation: hitAnim .55s forwards;
+}
+
+.muzzle {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle,
+    white 0 10%,
+    #ffe600 15%,
+    #ff5500 35%,
+    transparent 70%);
+  pointer-events: none;
+  z-index: 44;
+  animation: muzzleAnim .18s forwards;
+}
+
+#startScreen,
+#gameOver {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background:
+    linear-gradient(
+      rgba(0,0,0,.72),
+      rgba(0,0,0,.82)
+    );
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 25px;
+}
+
+.panel {
+  width: min(420px, 90vw);
+}
+
+.logo {
+  font-size: 43px;
+  font-weight: 1000;
+  letter-spacing: -2px;
+  margin-bottom: 5px;
+}
+
+.sub {
+  color: #bbb;
+  margin-bottom: 28px;
+}
+
+button {
+  width: 100%;
+  min-height: 56px;
+  border: 0;
+  border-radius: 16px;
+  background: #e60000;
+  color: white;
+  font-size: 20px;
+  font-weight: 900;
+  box-shadow: 0 7px 0 #800000;
+  touch-action: manipulation;
+}
+
+button:active {
+  transform: translateY(5px);
+  box-shadow: 0 2px 0 #800000;
+}
+
+.small {
+  margin-top: 18px;
+  color: #999;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#gameOver {
+  display: none;
+}
+
+.finalScore {
+  font-size: 50px;
+  font-weight: 1000;
+  margin: 15px 0 25px;
+}
+
+@keyframes enemyFloat {
+  from {
+    transform: translate(-50%, -50%) scale(.96);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+@keyframes hitAnim {
+  0% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%)
+      scale(.7);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(-50%, -100px)
+      scale(1.5);
+  }
+}
+
+@keyframes muzzleAnim {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(.3);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enemy {
+    animation: none;
+  }
+
+  .hit,
+  .muzzle {
+    animation-duration: .01s;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+  <video id="camera"
+         autoplay
+         muted
+         playsinline></video>
+
+  <div id="gameLayer"></div>
+
+  <div id="hud">
+    <div class="hudBox">
+      SCORE
+      <div id="score">0</div>
+      <div id="combo">COMBO ×1</div>
+    </div>
+
+    <div class="hudBox">
+      <div id="time">30</div>
+      <div id="lives">❤️❤️❤️</div>
+    </div>
+  </div>
+
+  <div class="crosshair"
+       id="crosshair"
+       style="left:50%;top:50%;">
+  </div>
+
+  <div id="startScreen">
+    <div class="panel">
+
+      <div class="logo">
+        CAMERA<br>HUNTER
+      </div>
+
+      <div class="sub">
+        現実世界に出現する敵を撃て。
+      </div>
+
+      <button id="startButton">
+        📷 GAME START
+      </button>
+
+      <div class="small">
+        カメラの使用許可が表示されたら<br>
+        「許可」を選択してください。<br><br>
+        30秒間で何体倒せる？
+      </div>
+
+    </div>
+  </div>
+
+  <div id="gameOver">
+    <div class="panel">
+
+      <div class="logo">
+        GAME OVER
+      </div>
+
+      <div class="finalScore"
+           id="finalScore">
+        0
+      </div>
+
+      <button id="restartButton">
+        🔥 RETRY
+      </button>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+const camera = document.getElementById("camera");
+const gameLayer = document.getElementById("gameLayer");
+
+const startScreen = document.getElementById("startScreen");
+const gameOver = document.getElementById("gameOver");
+
+const startButton = document.getElementById("startButton");
+const restartButton = document.getElementById("restartButton");
+
+const scoreEl = document.getElementById("score");
+const comboEl = document.getElementById("combo");
+const timeEl = document.getElementById("time");
+const livesEl = document.getElementById("lives");
+const finalScoreEl = document.getElementById("finalScore");
+
+let score = 0;
+let combo = 0;
+let lives = 3;
+let timeLeft = 30;
+
+let playing = false;
+let timer = null;
+let enemyTimer = null;
+
+let enemies = [];
+
+let difficulty = 1;
+
+function updateHUD() {
+
+  scoreEl.textContent = score;
+
+  comboEl.textContent =
+    "COMBO ×" + Math.max(1, combo);
+
+  timeEl.textContent =
+    timeLeft;
+
+  livesEl.textContent =
+    "❤️".repeat(lives) +
+    "🖤".repeat(3 - lives);
+}
+
+async function startCamera() {
+
+  if (!navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia) {
+
+    alert(
+      "このブラウザではカメラを利用できません。"
+    );
+
+    return false;
+  }
+
+  try {
+
+    const stream =
+      await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: {
+            ideal: "environment"
+          }
+        },
+        audio: false
+      });
+
+    camera.srcObject = stream;
+
+    await camera.play();
+
+    return true;
+
+  } catch (error) {
+
+    alert(
+      "カメラを使用できませんでした。\n\n" +
+      "Safariのサイト設定からカメラを許可してください。"
+    );
+
+    return false;
+  }
+}
+
+function randomPosition() {
+
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  const marginX = 65;
+  const marginTop = 100;
+  const marginBottom = 90;
+
+  return {
+    x:
+      marginX +
+      Math.random() *
+      Math.max(1, w - marginX * 2),
+
+    y:
+      marginTop +
+      Math.random() *
+      Math.max(
+        1,
+        h - marginTop - marginBottom
+      )
+  };
+}
+
+function createEnemy() {
+
+  if (!playing) return;
+
+  const pos = randomPosition();
+
+  const enemy = document.createElement("div");
+
+  enemy.className = "enemy";
+
+  const body =
+    document.createElement("div");
+
+  body.className = "enemyBody";
+
+  enemy.appendChild(body);
+
+  enemy.style.left = pos.x + "px";
+  enemy.style.top = pos.y + "px";
+
+  const size =
+    Math.max(
+      45,
+      76 - difficulty * 3
+    );
+
+  enemy.style.width =
+    size + "px";
+
+  enemy.style.height =
+    size + "px";
+
+  enemy.dataset.x = pos.x;
+  enemy.dataset.y = pos.y;
+
+  enemy.addEventListener(
+    "pointerdown",
+    function(e) {
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      shootEnemy(enemy);
+
+    },
+    {
+      passive: false
+    }
+  );
+
+  gameLayer.appendChild(enemy);
+
+  enemies.push(enemy);
+
+  const lifeTime =
+    Math.max(
+      700,
+      1800 - difficulty * 100
+    );
+
+  setTimeout(() => {
+
+    if (!enemy.isConnected) return;
+
+    if (playing) {
+
+      missEnemy(enemy);
+
+    }
+
+  }, lifeTime);
+}
+
+function shootEnemy(enemy) {
+
+  if (!playing) return;
+
+  const x =
+    parseFloat(enemy.dataset.x);
+
+  const y =
+    parseFloat(enemy.dataset.y);
+
+  const points =
+    100 *
+    Math.max(1, combo + 1);
+
+  score += points;
+
+  combo++;
+
+  if (navigator.vibrate) {
+    navigator.vibrate(25);
+  }
+
+  createHit(x, y, "+" + points);
+
+  enemy.remove();
+
+  enemies =
+    enemies.filter(
+      e => e !== enemy
+    );
+
+  updateHUD();
+}
+
+function missEnemy(enemy) {
+
+  if (!enemy.isConnected) return;
+
+  enemy.remove();
+
+  enemies =
+    enemies.filter(
+      e => e !== enemy
+    );
+
+  lives--;
+
+  combo = 0;
+
+  updateHUD();
+
+  if (lives <= 0) {
+
+    endGame();
+
+  }
+}
+
+function createHit(x, y, text) {
+
+  const hit =
+    document.createElement("div");
+
+  hit.className = "hit";
+
+  hit.textContent = text;
+
+  hit.style.left = x + "px";
+  hit.style.top = y + "px";
+
+  gameLayer.appendChild(hit);
+
+  setTimeout(() => {
+    hit.remove();
+  }, 600);
+
+  const muzzle =
+    document.createElement("div");
+
+  muzzle.className = "muzzle";
+
+  muzzle.style.left = x + "px";
+  muzzle.style.top = y + "px";
+
+  gameLayer.appendChild(muzzle);
+
+  setTimeout(() => {
+    muzzle.remove();
+  }, 200);
+}
+
+function playerShoot(x, y) {
+
+  if (!playing) return;
+
+  /*
+    敵を直接タップできない場合でも、
+    タップ位置の近くに敵がいれば命中。
+  */
+
+  let closest = null;
+  let distance = Infinity;
+
+  enemies.forEach(enemy => {
+
+    const ex =
+      parseFloat(enemy.dataset.x);
+
+    const ey =
+      parseFloat(enemy.dataset.y);
+
+    const d =
+      Math.hypot(
+        ex - x,
+        ey - y
+      );
+
+    if (d < distance) {
+
+      distance = d;
+      closest = enemy;
+
+    }
+
+  });
+
+  if (closest &&
+      distance < 65) {
+
+    shootEnemy(closest);
+
+  } else {
+
+    combo = 0;
+
+    createHit(x, y, "MISS");
+
+    updateHUD();
+
+  }
+}
+
+gameLayer.addEventListener(
+  "pointerdown",
+  function(e) {
+
+    if (!playing) return;
+
+    playerShoot(
+      e.clientX,
+      e.clientY
+    );
+
+  },
+  {
+    passive: false
+  }
+);
+
+function startGame() {
+
+  score = 0;
+  combo = 0;
+  lives = 3;
+  timeLeft = 30;
+  difficulty = 1;
+
+  enemies.forEach(e => e.remove());
+
+  enemies = [];
+
+  updateHUD();
+
+  startScreen.style.display = "none";
+  gameOver.style.display = "none";
+
+  playing = true;
+
+  createEnemy();
+  createEnemy();
+
+  enemyTimer =
+    setInterval(() => {
+
+      if (!playing) return;
+
+      createEnemy();
+
+      if (difficulty > 3) {
+        createEnemy();
+      }
+
+    }, 850);
+
+  timer =
+    setInterval(() => {
+
+      if (!playing) return;
+
+      timeLeft--;
+
+      difficulty =
+        1 +
+        Math.floor(
+          (30 - timeLeft) / 5
+        );
+
+      updateHUD();
+
+      if (timeLeft <= 0) {
+
+        endGame();
+
+      }
+
+    }, 1000);
+}
+
+function endGame() {
+
+  if (!playing) return;
+
+  playing = false;
+
+  clearInterval(timer);
+  clearInterval(enemyTimer);
+
+  timer = null;
+  enemyTimer = null;
+
+  enemies.forEach(e => e.remove());
+
+  enemies = [];
+
+  finalScoreEl.textContent =
+    score;
+
+  gameOver.style.display =
+    "flex";
+}
+
+startButton.addEventListener(
+  "click",
+  async () => {
+
+    startButton.disabled = true;
+
+    const ok =
+      await startCamera();
+
+    startButton.disabled = false;
+
+    if (ok) {
+      startGame();
+    }
+
+  }
+);
+
+restartButton.addEventListener(
+  "click",
+  async () => {
+
+    if (!camera.srcObject) {
+
+      const ok =
+        await startCamera();
+
+      if (!ok) return;
+
+    }
+
+    startGame();
+
+  }
+);
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    document.body.style.height =
+      window.innerHeight + "px";
+
+  }
+);
+
+updateHUD();
+
+</script>
+
+</body>
+</html>
