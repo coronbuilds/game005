@@ -3,13 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"
-      content="width=device-width,
-      initial-scale=1,
-      maximum-scale=1,
-      user-scalable=no,
-      viewport-fit=cover">
+content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
-<title>Camera Aim Test</title>
+<title>CAMERA HUNTER TEST</title>
 
 <style>
 *{
@@ -33,6 +29,7 @@ html,body{
   position:fixed;
   inset:0;
   overflow:hidden;
+  background:#000;
 }
 
 #camera{
@@ -46,22 +43,26 @@ html,body{
 #info{
   position:absolute;
   z-index:20;
-  top:calc(env(safe-area-inset-top) + 10px);
-  left:10px;
-  right:10px;
-  color:white;
-  font-size:15px;
-  font-weight:bold;
-  text-shadow:0 2px 5px #000;
+  top:calc(env(safe-area-inset-top) + 12px);
+  left:12px;
+  right:12px;
+  color:#fff;
+  font-weight:900;
+  text-shadow:0 2px 6px #000;
+}
+
+#title{
+  font-size:20px;
 }
 
 #heading{
-  font-size:25px;
   margin-top:5px;
+  font-size:25px;
 }
 
-#instruction{
-  margin-top:8px;
+#status{
+  margin-top:6px;
+  font-size:14px;
   color:#ffe600;
 }
 
@@ -70,41 +71,56 @@ html,body{
   z-index:30;
   left:50%;
   top:50%;
-  width:100px;
-  height:100px;
+  width:110px;
+  height:110px;
   transform:translate(-50%,-50%);
   pointer-events:none;
 }
 
-#crosshair:before{
-  content:"";
+#crosshair .circle{
   position:absolute;
-  left:0;
-  right:0;
-  top:49px;
-  height:2px;
-  background:white;
-}
-
-#crosshair:after{
-  content:"";
-  position:absolute;
-  top:0;
-  bottom:0;
-  left:49px;
-  width:2px;
-  background:white;
-}
-
-#circle{
-  position:absolute;
-  inset:12px;
+  inset:10px;
   border:3px solid white;
   border-radius:50%;
 }
 
+#crosshair .horizontal{
+  position:absolute;
+  left:0;
+  top:54px;
+  width:110px;
+  height:2px;
+  background:white;
+}
+
+#crosshair .vertical{
+  position:absolute;
+  left:54px;
+  top:0;
+  width:2px;
+  height:110px;
+  background:white;
+}
+
+#crosshair .dot{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:7px;
+  height:7px;
+  transform:translate(-50%,-50%);
+  background:red;
+  border-radius:50%;
+}
+
+
+/* =========================
+   敵
+========================= */
+
 #enemy{
   position:absolute;
+
   z-index:25;
 
   left:50%;
@@ -113,30 +129,31 @@ html,body{
   width:90px;
   height:90px;
 
-  transform:
-    translate(-50%,-50%);
+  transform:translate(-50%,-50%);
+
+  display:block;
 
   border:4px solid white;
   border-radius:50%;
 
   background:
     radial-gradient(
-      circle at 32% 35%,
+      circle at 32% 32%,
       white 0 5%,
       transparent 6%
     ),
     radial-gradient(
-      circle at 68% 35%,
+      circle at 68% 32%,
       white 0 5%,
       transparent 6%
     ),
     radial-gradient(
-      circle at 32% 35%,
+      circle at 32% 32%,
       red 0 14%,
       transparent 15%
     ),
     radial-gradient(
-      circle at 68% 35%,
+      circle at 68% 32%,
       red 0 14%,
       transparent 15%
     ),
@@ -145,14 +162,22 @@ html,body{
       #111 0 18%,
       transparent 19%
     ),
-    #d00000;
+    linear-gradient(
+      #ff2020,
+      #700000
+    );
 
   box-shadow:
     0 0 20px red,
-    0 0 45px red;
+    0 0 50px red;
 
   pointer-events:none;
 }
+
+
+/* =========================
+   START
+========================= */
 
 #start{
   position:absolute;
@@ -163,11 +188,29 @@ html,body{
   align-items:center;
   justify-content:center;
 
-  background:rgba(0,0,0,.85);
+  background:rgba(0,0,0,.88);
 }
 
-#start button{
-  width:280px;
+#startPanel{
+  width:90%;
+  max-width:400px;
+  text-align:center;
+  color:white;
+}
+
+#startPanel h1{
+  margin:0 0 15px;
+  font-size:40px;
+  line-height:.9;
+}
+
+#startPanel p{
+  color:#ddd;
+  line-height:1.7;
+}
+
+#startButton{
+  width:100%;
   height:70px;
 
   border:0;
@@ -178,31 +221,23 @@ html,body{
 
   font-size:21px;
   font-weight:900;
+
+  box-shadow:
+    0 6px 0 #600000;
+
+  touch-action:manipulation;
 }
 
-#status{
-  position:absolute;
-  z-index:50;
+#startButton:active{
+  transform:translateY(5px);
+}
 
-  left:50%;
-  bottom:30px;
-
-  transform:translateX(-50%);
-
-  color:white;
-
-  background:rgba(0,0,0,.65);
-
-  padding:12px 18px;
-
-  border-radius:12px;
-
-  font-weight:bold;
-
-  white-space:nowrap;
+.hidden{
+  display:none !important;
 }
 </style>
 </head>
+
 
 <body>
 
@@ -215,34 +250,64 @@ html,body{
     playsinline>
   </video>
 
+
   <div id="info">
 
-    CAMERA AIM TEST
+    <div id="title">
+      CAMERA HUNTER TEST
+    </div>
 
     <div id="heading">
       方位：---
     </div>
 
-    <div id="instruction">
-      スマホをゆっくり右へ90°回してください
+    <div id="status">
+      STARTを押してください
     </div>
 
   </div>
 
+
   <div id="crosshair">
-    <div id="circle"></div>
+
+    <div class="circle"></div>
+
+    <div class="horizontal"></div>
+
+    <div class="vertical"></div>
+
+    <div class="dot"></div>
+
   </div>
+
+
+  <!-- 敵 -->
 
   <div id="enemy"></div>
 
-  <div id="status">
-    STARTを押してください
-  </div>
+
+  <!-- START画面 -->
 
   <div id="start">
-    <button id="startButton">
-      📷 START
-    </button>
+
+    <div id="startPanel">
+
+      <h1>
+        CAMERA<br>
+        HUNTER
+      </h1>
+
+      <p>
+        スマホを動かして<br>
+        敵を探すテストです。
+      </p>
+
+      <button id="startButton">
+        📷 START
+      </button>
+
+    </div>
+
   </div>
 
 </div>
@@ -253,17 +318,15 @@ html,body{
 "use strict";
 
 
+/* =========================
+   DOM
+========================= */
+
 const camera =
   document.getElementById("camera");
 
 const enemy =
   document.getElementById("enemy");
-
-const headingText =
-  document.getElementById("heading");
-
-const status =
-  document.getElementById("status");
 
 const start =
   document.getElementById("start");
@@ -271,16 +334,28 @@ const start =
 const startButton =
   document.getElementById("startButton");
 
+const headingText =
+  document.getElementById("heading");
 
-/*
-========================================
- カメラ
-========================================
-*/
+const status =
+  document.getElementById("status");
+
+
+/* =========================
+   CAMERA
+========================= */
 
 let stream = null;
 
 async function startCamera(){
+
+  if(
+    !navigator.mediaDevices ||
+    !navigator.mediaDevices.getUserMedia
+  ){
+
+    return false;
+  }
 
   try{
 
@@ -298,17 +373,22 @@ async function startCamera(){
 
         });
 
+
     camera.srcObject =
       stream;
 
+
     await camera.play();
+
 
     return true;
 
-  }catch(e){
+  }catch(error){
 
-    status.textContent =
-      "カメラを許可してください";
+    console.log(
+      "Camera error:",
+      error
+    );
 
     return false;
 
@@ -317,52 +397,71 @@ async function startCamera(){
 }
 
 
-/*
-========================================
- コンパス
-========================================
-*/
+/* =========================
+   SENSOR
+========================= */
 
 let heading = null;
 
+let sensorStarted = false;
 
-/*
- iPhone Safariでは
- webkitCompassHeadingを最優先
-*/
 
-function orientation(e){
+function normalize(value){
 
-  let h = null;
+  value =
+    value % 360;
 
+  if(value < 0){
+
+    value += 360;
+
+  }
+
+  return value;
+
+}
+
+
+function orientationHandler(event){
+
+  let value = null;
+
+
+  /*
+   * iPhone Safari
+   * コンパスを最優先
+   */
 
   if(
-    typeof e.webkitCompassHeading ===
+    typeof event.webkitCompassHeading ===
     "number" &&
-    e.webkitCompassHeading !== 0
+    event.webkitCompassHeading !== 0
   ){
 
-    h =
-      e.webkitCompassHeading;
+    value =
+      event.webkitCompassHeading;
 
   }
   else if(
-    typeof e.alpha === "number"
+    typeof event.alpha ===
+    "number"
   ){
 
-    h =
-      e.alpha;
+    value =
+      event.alpha;
 
   }
 
 
-  if(h === null){
+  if(value === null){
+
     return;
+
   }
 
 
   heading =
-    normalize(h);
+    normalize(value);
 
 
   headingText.textContent =
@@ -370,28 +469,11 @@ function orientation(e){
     heading.toFixed(1) +
     "°";
 
-}
 
-
-function normalize(v){
-
-  v =
-    v % 360;
-
-  if(v < 0){
-    v += 360;
-  }
-
-  return v;
+  sensorStarted = true;
 
 }
 
-
-/*
-========================================
- センサー開始
-========================================
-*/
 
 async function startSensor(){
 
@@ -400,97 +482,102 @@ async function startSensor(){
     "undefined"
   ){
 
-    status.textContent =
-      "この端末ではセンサーが使えません";
-
     return false;
 
   }
 
 
-  if(
-    typeof DeviceOrientationEvent
-      .requestPermission ===
-    "function"
-  ){
+  try{
 
-    try{
+    /*
+     * iPhone
+     */
 
-      const result =
+    if(
+      typeof DeviceOrientationEvent
+        .requestPermission ===
+      "function"
+    ){
+
+      const permission =
         await DeviceOrientationEvent
           .requestPermission();
 
-      if(result !== "granted"){
 
-        status.textContent =
-          "モーションセンサーを許可してください";
+      if(
+        permission !== "granted"
+      ){
 
         return false;
 
       }
 
-    }catch(e){
-
-      status.textContent =
-        "センサー許可に失敗しました";
-
-      return false;
-
     }
 
+
+    window.addEventListener(
+      "deviceorientation",
+      orientationHandler,
+      true
+    );
+
+
+    window.addEventListener(
+      "deviceorientationabsolute",
+      orientationHandler,
+      true
+    );
+
+
+    return true;
+
+  }catch(error){
+
+    console.log(
+      "Sensor error:",
+      error
+    );
+
+    return false;
+
   }
-
-
-  window.addEventListener(
-    "deviceorientation",
-    orientation,
-    true
-  );
-
-
-  /*
-   * iOSによっては
-   * absoluteイベントの方が
-   * 方位を取りやすい
-   */
-
-  window.addEventListener(
-    "deviceorientationabsolute",
-    orientation,
-    true
-  );
-
-
-  return true;
 
 }
 
 
+/* =========================
+   敵
+========================= */
+
+
 /*
-========================================
- 敵の絶対位置
-========================================
-
- ★ここが超重要★
-
- 敵は「東」に固定する。
-
- スマホをどこへ向けても
- enemyHeading は変わらない。
-*/
+ * 敵は「東」に固定。
+ *
+ * 重要：
+ * この値はゲーム中変えない。
+ */
 
 const enemyHeading = 90;
 
 
-/*
-========================================
- 敵を画面に表示
-========================================
-*/
-
 function updateEnemy(){
 
+  /*
+   * センサーがまだ取れていない
+   *
+   * → 敵は中央
+   */
+
   if(heading === null){
+
+    enemy.style.display =
+      "block";
+
+    enemy.style.left =
+      "50%";
+
+    enemy.style.top =
+      "50%";
 
     return;
 
@@ -500,172 +587,85 @@ function updateEnemy(){
   /*
    * 敵の絶対方位
    * -
-   * 現在のスマホの方位
+   * スマホの現在方位
    */
 
-  let diff =
+  let difference =
     enemyHeading -
     heading;
 
 
   /*
-   * -180 ～ +180
+   * -180〜180
    */
 
-  while(diff > 180){
-    diff -= 360;
+  while(
+    difference > 180
+  ){
+
+    difference -= 360;
+
   }
 
-  while(diff < -180){
-    diff += 360;
+
+  while(
+    difference < -180
+  ){
+
+    difference += 360;
+
   }
 
 
   /*
-   * 水平方向の視野角。
-   *
-   * 70°を画面いっぱいとする。
+   * 画面横方向へ変換
    */
 
-  const fov = 70;
+  const FOV = 70;
 
 
-  const screenWidth =
+  const x =
+    window.innerWidth / 2 +
+    (
+      difference /
+      FOV
+    ) *
     window.innerWidth;
 
 
-  const center =
-    screenWidth / 2;
-
-
   /*
-   * ★重要★
-
-   * diff が + なら右
-   * diff が - なら左
+   * 敵は中央の高さ
    */
 
-  const x =
-    center +
-    (
-      diff / fov
-    ) *
-    screenWidth;
+  const y =
+    window.innerHeight / 2;
+
+
+  enemy.style.display =
+    "block";
 
 
   enemy.style.left =
     x + "px";
 
 
-  /*
-   * デバッグ表示
-   */
+  enemy.style.top =
+    y + "px";
+
 
   status.textContent =
-    "敵の方位 90° / 現在 " +
+    "敵：東 90° / 現在：" +
     heading.toFixed(1) +
-    "° / 差 " +
-    diff.toFixed(1) +
+    "° / 差：" +
+    difference.toFixed(1) +
     "°";
 
 }
 
 
-/*
-========================================
- START
-========================================
-*/
-
-startButton.addEventListener(
-  "click",
-  async function(){
-
-    startButton.disabled =
-      true;
-
-
-    status.textContent =
-      "センサーを起動中…";
-
-
-    const sensor =
-      await startSensor();
-
-
-    const cam =
-      await startCamera();
-
-
-    if(
-      !sensor ||
-      !cam
-    ){
-
-      startButton.disabled =
-        false;
-
-      return;
-
-    }
-
-
-    /*
-     * センサー値が入るまで少し待つ
-     */
-
-    let count = 0;
-
-    while(
-      heading === null &&
-      count < 30
-    ){
-
-      await new Promise(
-        r =>
-          setTimeout(r,100)
-      );
-
-      count++;
-
-    }
-
-
-    if(heading === null){
-
-      status.textContent =
-        "方位を取得できませんでした";
-
-      startButton.disabled =
-        false;
-
-      return;
-
-    }
-
-
-    start.classList.add(
-      "hidden"
-    );
-
-
-    status.textContent =
-      "敵を探してください";
-
-
-    requestAnimationFrame(
-      loop
-    );
-
-  }
-);
-
-
-/*
-========================================
- LOOP
-========================================
-*/
+/* =========================
+   LOOP
+========================= */
 
 function loop(){
 
@@ -678,15 +678,117 @@ function loop(){
 }
 
 
-/*
-========================================
- 画面操作防止
-========================================
-*/
+/* =========================
+   START
+========================= */
+
+startButton.addEventListener(
+  "click",
+  async function(event){
+
+    event.preventDefault();
+
+
+    startButton.disabled =
+      true;
+
+
+    status.textContent =
+      "起動中…";
+
+
+    /*
+     * ★★★
+     *
+     * 先にSTART画面を消す。
+     * センサーやカメラが失敗しても
+     * 敵は表示する。
+     *
+     * ★★★
+     */
+
+    start.classList.add(
+      "hidden"
+    );
+
+
+    /*
+     * 敵を強制表示
+     */
+
+    enemy.style.display =
+      "block";
+
+    enemy.style.left =
+      "50%";
+
+    enemy.style.top =
+      "50%";
+
+
+    /*
+     * カメラ
+     */
+
+    const cameraOK =
+      await startCamera();
+
+
+    /*
+     * センサー
+     */
+
+    const sensorOK =
+      await startSensor();
+
+
+    /*
+     * センサーがなくてもゲーム開始
+     */
+
+    if(cameraOK){
+
+      status.textContent =
+        "🔴 敵が出ています";
+
+    }else{
+
+      status.textContent =
+        "🔴 敵が出ています（カメラなし）";
+
+    }
+
+
+    if(!sensorOK){
+
+      status.textContent +=
+        " / センサー待機中";
+
+    }
+
+
+    requestAnimationFrame(
+      loop
+    );
+
+  },
+  {
+    passive:false
+  }
+);
+
+
+/* =========================
+   iPhoneズーム防止
+========================= */
 
 document.addEventListener(
   "dblclick",
-  e => e.preventDefault(),
+  function(e){
+
+    e.preventDefault();
+
+  },
   {
     passive:false
   }
@@ -694,7 +796,11 @@ document.addEventListener(
 
 document.addEventListener(
   "gesturestart",
-  e => e.preventDefault(),
+  function(e){
+
+    e.preventDefault();
+
+  },
   {
     passive:false
   }
@@ -702,7 +808,11 @@ document.addEventListener(
 
 document.addEventListener(
   "gesturechange",
-  e => e.preventDefault(),
+  function(e){
+
+    e.preventDefault();
+
+  },
   {
     passive:false
   }
@@ -710,11 +820,26 @@ document.addEventListener(
 
 document.addEventListener(
   "gestureend",
-  e => e.preventDefault(),
+  function(e){
+
+    e.preventDefault();
+
+  },
   {
     passive:false
   }
 );
+
+
+/*
+ * 最初から敵を表示状態にする。
+ *
+ * START前はSTART画面で隠れているので
+ * 実際には見えない。
+ */
+
+enemy.style.display =
+  "block";
 
 </script>
 
